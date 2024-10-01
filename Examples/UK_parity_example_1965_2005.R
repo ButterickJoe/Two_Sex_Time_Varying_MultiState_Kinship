@@ -1,6 +1,6 @@
 
-source(here::here("Matrix Model" , "Functions_required.R"))
 
+source(here::here("Matrix Model" , "Two_Sex_Time_Variant_MultiState_Kinship.R"))
 
 ################# Historic sex-specific mortality rates
 U_list_F <- read_rds(here::here("Data",  "mort_mats_fem_1938_2070.Rds"))
