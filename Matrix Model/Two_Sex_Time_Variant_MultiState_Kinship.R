@@ -11,10 +11,9 @@
 #' @param T_list_females list of matrices with elements: female probability of moving from one stage to another. Each list entry ~ time-period
 #' @param T_list_males list of matrices with elements: male probability of moving from one stage to another. Each list entry ~ time-period
 #' @param H_list redistributes newborns across each stage to a specific age-class 
-#' @param output_kin character. kin to return. For example "m" for mother, "d" for daughter. See the `vignette` for all kin types.
 #' @param alpha numeric. Female portion at birth.
 #' @param parity logical. parity states imply age distribution of mothers re-scaled to not have parity 0 when Focal born. Default `TRUE`.
-#' @param list_output logical. Results as a list. Default `FALSE`.
+#' @param dist_output logical. Results as a data frame of accumulated kin by age of Focal if FALSE, and kin by their age*stage distribution by age of Focal if TRUE.
 #' @param sex_Focal character. Female or Male as the user requests
 #' @param stage_Focal Numeric in Natural number set {1,2,...,}. The stage which Focal is born into (e.g., 1 for parity 0)
 #' @param time_series vector. The times at which we wish to count kin: start year = time_series[1], and end year = time_series[length.]
@@ -34,7 +33,6 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                                      T_list_males = NULL,
                                      H_list = NULL,
                                      alpha = 0.51, ## Sex ration -- UK value default
-                                     output_kin = NULL,
                                      parity = TRUE,
                                      dist_output = FALSE,
                                      sex_Focal = "Female",

@@ -148,7 +148,6 @@ kin_out_1965_1985 <-
                          T_mat_fem[1:20],
                          H_mat[1:20],
                          alpha = 0.51, ## Sex ration -- UK value default
-                         output_kin = NULL,
                          parity = TRUE,
                          dist_output = TRUE,
                          sex_Focal = "Female", ##  to do ::: define Focal's sex at birth -- change IC in Proj file
