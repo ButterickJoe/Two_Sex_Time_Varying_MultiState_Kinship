@@ -148,9 +148,8 @@ kin_out_1965_2005 <-
                          T_mat_fem[1:40],
                          H_mat[1:40],
                          alpha = 0.51, ## Sex ration -- UK value default
-                         output_kin = NULL,
                          parity = TRUE,
-                         list_output = FALSE,
+                         dist_output = FALSE,
                          sex_Focal = "Female", ##  to do ::: define Focal's sex at birth -- change IC in Proj file
                          stage_Focal = 1, ## Define FOcals stage at birth -- projection fiule
                          seq(1965,(1965+40)))
