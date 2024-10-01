@@ -1,6 +1,6 @@
 # Two_Sex_Time_Varying_MultiState_Kinship
 
-Code to implement a combination of Hall Caswell's formal demography of kinship models: volumes II,III,IV; two-sex, multi-state kinship 
+Code to implement a combination of Hal Caswell's formal demography of kinship models: volumes II,III,IV; two-sex, multi-state kinship 
 subject to time-varying demographic rates.
 
 As data inputs the model needs, separate for males and females
