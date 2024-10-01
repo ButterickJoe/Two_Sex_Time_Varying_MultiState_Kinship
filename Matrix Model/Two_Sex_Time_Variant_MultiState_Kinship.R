@@ -36,7 +36,7 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                                      alpha = 0.51, ## Sex ration -- UK value default
                                      output_kin = NULL,
                                      parity = TRUE,
-                                     list_output = FALSE,
+                                     dist_output = FALSE,
                                      sex_Focal = "Female",
                                      stage_Focal = NULL,
                                      time_series){
@@ -247,13 +247,22 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                          "younger cousin",
                          "older cousin")
   ## create a nice data frame output
-  kin_out <- create_cumsum_TV(relative_data,
+  if(!dist_output){
+    kin_out <- create_cumsum_TV(relative_data,
+                                relative_names, 
+                                time_series[1]:time_series[length(time_series)], 
+                                time_series[1], 
+                                no_ages, 
+                                no_stages, 
+                                1)}
+  else{
+  kin_out <- create_full_dists_TV(relative_data,
                               relative_names, 
                               time_series[1]:time_series[length(time_series)], 
                               time_series[1], 
                               no_ages, 
                               no_stages, 
-                              1)
+                              1)}
   
   return(kin_out)
 }
