@@ -85,7 +85,7 @@ all_kin_dy <- function(Uf,
   
   ######### Category 1) Project Descendants #########################
   
-  ## Children
+  ################################################### Children
   X_children <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   IC_children <- rep(0, 2*n)
   X_children[,1] <- IC_children
@@ -93,7 +93,7 @@ all_kin_dy <- function(Uf,
     X_children[,i+1] <- Uproj%*%X_children[,i] + Fproj%*%X_Focal[,i] # e_vector(n+i,2*n) if focal is male
   }
   
-  ## Grand Children
+  ################################################## Grand Children
   X_grand_children <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   recruit_grand_children <- X_children ## recruitment from children's reproduction
   IC_grand_children <- rep(0, 2*n) ## No grand-children at birth IC = (0,0,....,0) (2n length)
@@ -103,7 +103,7 @@ all_kin_dy <- function(Uf,
     X_grand_children[,i+1] <- Uproj%*%X_grand_children[,i] + Fproj%*%recruit_grand_children[,i]
   }
   
-  ## Great grand children 
+  ################################################ Great grand children 
   X_great_grand_children <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   recruit_great_grand_children <- X_grand_children ## recruitment from children's reproduction
   IC_great_grand_children <- rep(0, 2*n) ## No grand-children at birth IC = (0,0,....,0) (2n length)
@@ -115,7 +115,7 @@ all_kin_dy <- function(Uf,
   
   ######### Category 2) Project Ancestors #########################
   
-  # Parents
+  #################################################### Parents
   X_parents <- as(matrix(0, nrow = 2*n, ncol = na, byrow = T),"sparseMatrix")
   IC_parents <- mothers_age_stage
   X_parents[, 1] <- IC_parents
@@ -123,8 +123,7 @@ all_kin_dy <- function(Uf,
   foreach(i = 1 : (na-1))%do%{
     X_parents[, i+1] <- Uproj%*%X_parents[, i] 
   }
-  
-  ## Grand pars
+  ################################################### Grand parents
   X_grand_parents <- as( matrix(0, nrow = 2*n, ncol = na, byrow = T) ,"sparseMatrix")
   ## Initial conditions (female and male grand parents)
   IC_gps <- rep(0, 2*n)
@@ -141,7 +140,7 @@ all_kin_dy <- function(Uf,
   
   #### Category 3). Siblings ########################
   
-  ## Older sibs
+  ################################################# Older sibs
   X_older_sibs  <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   ## Initial conditions (female and male older siblings)
   IC_os <- rep(0, 2*n)
@@ -154,8 +153,7 @@ all_kin_dy <- function(Uf,
   foreach(i = 1 : (na-1))%do%{
     X_older_sibs[,i+1] <- Uproj%*%X_older_sibs[,i] 
   }
-  
-  ## Younger siblings
+  ################################################ Younger siblings
   X_younger_sibs  <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   ## Initial conditions (female and male younger siblings)
   IC_younger_sibs <- rep(0, n*2) ## No younger sisters at birth 
@@ -168,7 +166,7 @@ all_kin_dy <- function(Uf,
   
   #### Category 4). Nieces and nephews ##########
   
-  ## Older Nieces and Nephews
+  ################################################ Older Nieces and Nephews
   X_older_niece_nephew  <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   ## Initial conditions (female and male older niece/nephew) expected number of grandchildren of mother * age specific fertility
   IC_onn <- rep(0, n*2) 
@@ -182,8 +180,7 @@ all_kin_dy <- function(Uf,
   foreach(i = 1 : (na-1))%do%{
     X_older_niece_nephew[,i+1] <- Uproj%*%X_older_niece_nephew[,i] + Fproj%*%recruit_older_niece_nephew[,i]
   }
-  
-  ## Younger Nieces and Nephews
+  ############################################### Younger Nieces and Nephews
   X_younger_niece_nephew  <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   ## recruitment from younger siblings
   recruit_younger_niece_nephew <- X_younger_sibs
@@ -195,7 +192,7 @@ all_kin_dy <- function(Uf,
   
   #### Category 5). Aunts and uncles ##############
   
-  ## Older Aunts and Uncles
+  ################################################ Older Aunts and Uncles
   X_older_aunt_uncle  <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   ## IC
   IC_au <- rep(0, n*2) ## At birth, older sibs of mother and father over all their possible ages:
@@ -208,8 +205,7 @@ all_kin_dy <- function(Uf,
   foreach(i = 1 : (na-1))%do%{
     X_older_aunt_uncle[,i+1] <- Uproj%*%X_older_aunt_uncle[,i] 
   }
-  
-  ## Younger aunts and uncles
+  ################################################ Younger aunts and uncles
   X_younger_aunts_uncles <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   ## IC
   IC_yau <- rep(0, n*2) ## At birth, younger sibs of mother and father over all ages
@@ -218,7 +214,7 @@ all_kin_dy <- function(Uf,
   foreach(ic = 1 : (na-1))%do%{
     IC_yau <- IC_yau + (pi_younger_aunts_uncles_f[ic] + pi_younger_aunts_uncles_m[ic])*X_younger_sibs[,ic]
   }
-  ## recruitment comes from grandparents here
+  ## recruitment comes from X_grand_parents here
   X_younger_aunts_uncles[,1] <- IC_yau
   foreach(i = 1 : (na-1))%do%{
     X_younger_aunts_uncles[,i+1] <- Uproj%*%X_younger_aunts_uncles[,i] + Fprojstar%*%X_grand_parents[,i]
@@ -226,7 +222,7 @@ all_kin_dy <- function(Uf,
   
   #### Last Category I consider (but please add more) is Cousins ###########
   
-  ## Older cousins
+  ################################################# Older cousins
   X_older_cousins  <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   ## Initial conditions: 
   IC_oc <- rep(0, n*2) ## At birth, older cousins come from mother and father's older niece/nephews
@@ -241,7 +237,7 @@ all_kin_dy <- function(Uf,
     X_older_cousins[,i+1] <- Uproj%*%X_older_cousins[,i] + Fproj%*%X_older_aunt_uncle[,i]
   }
   
-  ## Younger cousins
+  ################################################## Younger cousins
   X_younger_cousins  <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   ## Initial conditions: 
   IC_yc <- rep(0, n*2) ## At birth, younger cousins come from mother/father's younger niece/nephew
@@ -339,8 +335,6 @@ all_kin_dy_TV <- function(Uf,
       fathers_age_dist <- parents_ages[[2]]
     }
     
-  
-  
   ########################################### Matrix projections for kinship
   ##############################################################################################################
   
@@ -361,7 +355,6 @@ all_kin_dy_TV <- function(Uf,
   for(i in 1 : (na -1) ){
     X_Focal[,i+1] <- G_tilde%*%previous_kin_Focal[,i] 
   }
-  
   # children
   X_children <-as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   IC_children <- rep(0, n*2)
@@ -384,14 +377,14 @@ all_kin_dy_TV <- function(Uf,
     X_great_grand_children[,i+1] <- Uproj%*%prev_kin_greatgrandchildren[,i] + Fproj%*%prev_kin_grandchildren[,i]
   }
   ## Ancestors
-  # Parents
+  ############################################ Parents
   X_parents <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   IC_parents <- mothers_age_stage
   X_parents[, 1] <- IC_parents
   foreach(i = 1 : (na-1))%do%{
     X_parents[, i+1] <- Uproj%*%prev_kin_parents[, i] 
   }
-  # Grand parents
+  ########################################### Grand parents
   X_grand_parents <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   IC_f_grand_parents <- mothers_age_dist
   IC_m_grand_parents <- fathers_age_dist
@@ -403,7 +396,7 @@ all_kin_dy_TV <- function(Uf,
   foreach(i = 1 : (na-1))%do%{
     X_grand_parents[, i+1] <- Uproj%*%prev_kin_grand_parents[, i] 
   }
-  ## Older sibs
+  ############################################## Older sibs
   X_older_sibs  <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   IC_older_sibs_f <- mothers_age_dist
   IC_os <- rep(0, 2*n)
@@ -414,14 +407,14 @@ all_kin_dy_TV <- function(Uf,
   foreach(i = 1 : (na-1))%do%{
     X_older_sibs[,i+1] <- Uproj%*%prev_kin_older_sibs[,i] 
   }
-  ## Younger sibs
+  ############################################### Younger sibs
   X_younger_sibs  <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   IC_younger_sibs <- rep(0, n*2) 
   X_younger_sibs[,1] <- IC_younger_sibs
   foreach(i = 1 : (na-1))%do%{
     X_younger_sibs[,i+1] <- Uproj%*%prev_kin_younger_sibs[,i] + Fprojstar%*%prev_kin_parents[,i]
   }
-  ## Older Nieces and Nephews
+  ############################################## Older Nieces and Nephews
   X_older_niece_nephew  <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   IC_onn <- rep(0, n*2) 
   IC_older_niece_nephew_f <- mothers_age_dist
@@ -432,15 +425,14 @@ all_kin_dy_TV <- function(Uf,
   foreach(i = 1 : (na-1))%do%{
     X_older_niece_nephew[,i+1] <- Uproj%*%prev_kin_older_niece_nephew[,i] + Fproj%*%prev_kin_older_sibs[,i]
   }
-  
-  ## Younger Nieces and Nephews
+  ########################################### Younger Nieces and Nephews
   X_younger_niece_nephew  <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   IC_younger_niece_nephew <- rep(0, n*2) 
   X_younger_niece_nephew[,1] <- IC_younger_niece_nephew
   foreach(i = 1 : (na-1))%do%{
     X_younger_niece_nephew[,i+1] <- Uproj%*%prev_kin_younger_niece_nephew[,i] + Fproj%*%prev_kin_younger_sibs[,i]
   }
-  ## Older Aunts and Uncles
+  ########################################## Older Aunts and Uncles
   X_older_aunt_uncle  <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   IC_au <- rep(0, n*2) 
   pi_older_aunt_uncle_f <- mothers_age_dist
@@ -452,7 +444,7 @@ all_kin_dy_TV <- function(Uf,
   foreach(i = 1 : (na-1))%do%{
     X_older_aunt_uncle[,i+1] <- Uproj%*%prev_kin_older_aunts_uncles[,i] 
   }
-  ## Younger aunts and uncles
+  ######################################### Younger aunts and uncles
   X_younger_aunts_uncles <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   IC_yau <- rep(0, n*2) 
   pi_younger_aunts_uncles_f <- mothers_age_dist
@@ -464,8 +456,7 @@ all_kin_dy_TV <- function(Uf,
   foreach(i = 1 : (na - 1) )%do%{
     X_younger_aunts_uncles[,i+1] <- Uproj%*%prev_kin_younger_aunts_uncles[,i] + Fprojstar%*%prev_kin_grand_parents[,i]
   }
-  
-  ## Older cousins
+  ######################################## Older cousins
   X_older_cousins  <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   IC_oc <- rep(0, n*2) 
   IC_older_cousins_f <- mothers_age_dist
@@ -477,8 +468,7 @@ all_kin_dy_TV <- function(Uf,
   foreach(i = 1 : (na - 1) )%do%{
     X_older_cousins[,i+1] <- Uproj%*%prev_kin_older_cousins[,i] + Fproj%*%prev_kin_older_aunts_uncles[,i]
   }
-  
-  ## Younger cousins
+  ########################################### Younger cousins
   X_younger_cousins  <- as(matrix(0, nrow = 2*n, ncol = na, byrow = TRUE),"sparseMatrix")
   IC_yc <- rep(0, n*2) 
   IC_younger_cousins_f <- mothers_age_dist
@@ -490,7 +480,6 @@ all_kin_dy_TV <- function(Uf,
   foreach(i = 1 : (na - 1) )%do%{
     X_younger_cousins[,i+1] <- Uproj%*%prev_kin_younger_cousins[,i] + Fproj%*%prev_kin_younger_aunts_uncles[,i]
   }
-  
   return(list(X_Focal,
               X_children,
               X_grand_children,
