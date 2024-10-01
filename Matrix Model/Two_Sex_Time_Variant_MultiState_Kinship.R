@@ -256,7 +256,7 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                          "older cousin")
   
   kin_out <- create_cumsum_TV(relative_data,
-                              list_relatives, 
+                              relative_names, 
                               time_series[1]:time_series[length(time_series)], 
                               time_series[1], 
                               no_ages, 
