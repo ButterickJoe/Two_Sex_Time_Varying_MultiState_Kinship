@@ -182,7 +182,10 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
     updating_pop_struct <- changing_pop_struct[[year]]
     
     ## Output of the time-variant model 
-    kin_out <- all_kin_dy_TV(U_tilde_females, U_tilde_males , F_tilde_females, F_tilde_males, 
+    kin_out <- all_kin_dy_TV(U_tilde_females, 
+                             U_tilde_males, 
+                             F_tilde_females, 
+                             F_tilde_males, 
                              alpha, 
                              no_ages, 
                              no_stages,  
