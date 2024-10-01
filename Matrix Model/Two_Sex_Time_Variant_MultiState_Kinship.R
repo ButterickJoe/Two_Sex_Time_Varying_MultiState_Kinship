@@ -6,15 +6,11 @@
 
 #' @param U_list_females -- list of matrices with elements: female probability of advancing age-class. Age in rows and states in columns. Each list entry ~ time-period.
 #' @param U_list_males -- list of matrices with elements: male probability of advancing age-class. Age in rows and states in columns. Each list entry ~ time-period.
-
 #' @param F_list_females list of matrices with elements: female state-specific fertility (age in rows and states in columns). Each list entry ~ time-period.
 #' @param F_list_males list of matrices with elements: male state-specific fertility (age in rows and states in columns). Each list entry ~ time-period.
-
 #' @param T_list_females list of matrices with elements: female probability of moving from one stage to another. Each list entry ~ time-period
 #' @param T_list_males list of matrices with elements: male probability of moving from one stage to another. Each list entry ~ time-period
- 
 #' @param H_list redistributes newborns across each stage to a specific age-class 
- 
 #' @param output_kin character. kin to return. For example "m" for mother, "d" for daughter. See the `vignette` for all kin types.
 #' @param alpha numeric. Female portion at birth.
 #' @param parity logical. parity states imply age distribution of mothers re-scaled to not have parity 0 when Focal born. Default `TRUE`.
@@ -22,10 +18,9 @@
 #' @param sex_Focal character. Female or Male as the user requests
 #' @param stage_Focal Numeric in Natural number set {1,2,...,}. The stage which Focal is born into (e.g., 1 for parity 0)
 #' @param time_series vector. The times at which we wish to count kin: start year = time_series[1], and end year = time_series[length.]
-
+#' 
 #' @return A data frame with focal´s age, related ages, stages, sexes, and types of kin for each time-period
  
-
 ## Import required functions and matrix operations
 source(here::here("Matrix Model", "Functions_required.R" ))
 source(here::here("Matrix Model", "Kin_projections.R" ))
@@ -38,13 +33,13 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                                      T_list_females = NULL,
                                      T_list_males = NULL,
                                      H_list = NULL,
-                            alpha = 0.51, ## Sex ration -- UK value default
-                            output_kin = NULL,
-                            parity = TRUE,
-                            list_output = FALSE,
-                            sex_Focal = "Female",
-                            stage_Focal = NULL,
-                            time_series){
+                                     alpha = 0.51, ## Sex ration -- UK value default
+                                     output_kin = NULL,
+                                     parity = TRUE,
+                                     list_output = FALSE,
+                                     sex_Focal = "Female",
+                                     stage_Focal = NULL,
+                                     time_series){
   
   no_years <- length(U_list_females)
   no_ages <- nrow(U_list_females[[1]])
@@ -56,7 +51,6 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
   if(!is.list(T_list_females) | !is.list(T_list_males)) stop("T's must be a list with time-series length. Each list entry should be an age*stage dimensional matrix")
 
   ### Define empty lists for the accumulated kin of Focals's life-course -- each list entry will reflect a time-period
-  
   changing_pop_struct <- list()
   Focal_array <- list()
   mom_array <- list()
@@ -107,7 +101,6 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
       H_mat[1,] <- 1
       H_list2[[(1+length(H_list2))]] <- H_mat
     }
-  
     foreach(age = 1:na)%do%{
       T_f <- T_data_f[[age]]
       T_m <- T_data_m[[age]]
@@ -128,14 +121,14 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
     T_m_BDD <- block_diag_function(T_m_list) ## direct sum of male stage transitions, independent over age (na diagonal blocks)
     F_f_BDD <- block_diag_function(F_f_list) ## direct sum of female stage->stage reproductions, independent over age (na blocks)
     F_m_BDD <- block_diag_function(F_m_list) ## direct sum of male stage->stage reproductions, independent over age (na blocks)
-
+    ## create the appropriate projection matrices
     U_tilde_females <- t(K_perm_mat(ns, na))%*%U_f_BDD%*%K_perm_mat(ns, na)%*%T_f_BDD ## create sex-specific age*stage projections
     U_tilde_males <- t(K_perm_mat(ns, na))%*%U_m_BDD%*%K_perm_mat(ns, na)%*%T_m_BDD
     F_tilde_females <- t(K_perm_mat(ns, na))%*%H_BDD%*%K_perm_mat(ns, na)%*%F_f_BDD
     F_tilde_males <- t(K_perm_mat(ns, na))%*%H_BDD%*%K_perm_mat(ns, na)%*%F_m_BDD
     
-    
-    if(year == 1){ ## if year == 1 we are at the boundary condition t=0 --> time-invariant kinship projections
+    ## if year == 1 we are at the boundary condition t=0 --> time-invariant kinship projections
+    if(year == 1){ 
       ## Output of the static model 
       kin_out_1 <- all_kin_dy(U_tilde_females, 
                               U_tilde_males , 
@@ -222,9 +215,8 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
     younger_cousin_array[[(1+length(younger_cousin_array))]] <- kin_out[[14]]
     older_cousin_array[[(1+length(older_cousin_array))]] <- kin_out[[13]]
     changing_pop_struct[[(1+length(changing_pop_struct))]] <- kin_out[[15]]
-    
   }
-  
+  ## create a list of output kin -- each element a time-period specific list of matrices
   relative_data <- list(Focal_array,
        daughter_array,
        grand_daughter_array,
@@ -239,7 +231,7 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
        older_niece_array,
        younger_cousin_array,
        older_cousin_array)
-  
+  ## label the kin names
   relative_names <- list("Focal",
                          "offspring",
                          "grand offspring", 
@@ -254,7 +246,7 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                          "older niece/nephews",
                          "younger cousin",
                          "older cousin")
-  
+  ## create a nice data frame output
   kin_out <- create_cumsum_TV(relative_data,
                               relative_names, 
                               time_series[1]:time_series[length(time_series)], 
