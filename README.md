@@ -27,3 +27,5 @@ As theoretical choices, the model needs
 
 3) Choice (if not parity) of the stage in which Focal is born
 
+
+An example of the model is given using UK parity as a state
