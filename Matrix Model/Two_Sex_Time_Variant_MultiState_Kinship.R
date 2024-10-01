@@ -16,7 +16,7 @@
 #' @param H_list redistributes newborns across each stage to a specific age-class 
  
 #' @param output_kin character. kin to return. For example "m" for mother, "d" for daughter. See the `vignette` for all kin types.
-#' @param birth_female numeric. Female portion at birth.
+#' @param alpha numeric. Female portion at birth.
 #' @param parity logical. parity states imply age distribution of mothers re-scaled to not have parity 0 when Focal born. Default `TRUE`.
 #' @param list_output logical. Results as a list. Default `FALSE`.
 #' @param sex_Focal character. Female or Male as the user requests
