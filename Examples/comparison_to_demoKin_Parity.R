@@ -139,25 +139,25 @@ rm(U_list_F_truncated)
 rm(U_list_M_truncated)
 gc()
 
-kin_out_1965_1975 <- 
-  kin_multi_stage_TV_2_sex(U_mat_fem[1:10], ## 40 years time-series of demographic rates (1965-2005) see last input...
-                         U_mat_male[1:10],
-                         F_mat_fem[1:10],
-                         F_mat_male[1:10],
-                         T_mat_fem[1:10],
-                         T_mat_fem[1:10],
-                         H_mat[1:10],
+kin_out_1965 <- 
+  kin_multi_stage_TV_2_sex(U_mat_fem[1:1], ## 40 years time-series of demographic rates (1965-2005) see last input...
+                         U_mat_male[1:1],
+                         F_mat_fem[1:1],
+                         F_mat_male[1:1],
+                         T_mat_fem[1:1],
+                         T_mat_fem[1:1],
+                         H_mat[1:1],
                          alpha = 0.51, ## Sex ratio -- UK here
                          parity = TRUE, ## this example uses parity
                          dist_output = FALSE, ## here we only want to know accumulated kin by age of Focal
                          sex_Focal = "Female", ##  define Focal's sex at birth 
                          stage_Focal = 1, ## Define Focals stage at birth -- if parity automatically set to 1
-                         seq(1965,(1965+10)))
+                         seq(1965,(1965+1)))
 
 
 
-
-kin_out_1965_1975%>%filter(group == "parents", Sex == "Female", year == 1965)%>%
+kin_out_1965$group%>%unique()
+kin_out_1965%>%filter(group == "older aunt/unlce", Sex == "Female", year == 1965)%>%
   dplyr::select(Age_Focal,Stage,pred_no_kin)%>%
   ggplot(aes(x = Age_Focal, y = pred_no_kin, color = Stage, fill = Stage)) +
   geom_bar(position = "stack", stat = "identity")
@@ -170,14 +170,15 @@ df_export <- kin_out_1965%>%filter(Sex == "Female", year == 1965)%>%
                                                                age_focal = Age_Focal,
                                                                living = pred_no_kin, 
                                                                kin = group)
-df_export
+df_export$kin%>%unique()
 df_export$kin <- ifelse(df_export$kin == "Focal", "focal",
                         ifelse(df_export$kin == "parents", "m",
                                ifelse(df_export$kin == "offspring", "d",
                                       ifelse(df_export$kin == "younger siblings", "ys",
                                              ifelse(df_export$kin == "older siblings", "os",
                                                     ifelse(df_export$kin == "younger aunt/uncle", "ya",
-                                                           ifelse(df_export$kin == "older aunt/uncle", "oa", NA)))))))
+                                                           ifelse(df_export$kin == "older aunt/unlce", "oa", 
+                                                                  ifelse(df_export$kin == "older cousin", "coa", NA))))))))
 
 
 saveRDS(df_export,"C:/Users/jb4u23/OneDrive - University of Southampton/Butterick year 1/R code/First files/Implementing Caswell/DemoKin/DemoKin-main/Butterick_parity_comparison/Joes_mother_parity.Rds")
