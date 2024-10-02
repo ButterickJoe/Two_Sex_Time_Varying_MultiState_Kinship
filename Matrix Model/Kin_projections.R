@@ -11,7 +11,7 @@ all_kin_dy <- function(Uf,
                        alpha, ## alpha = sex ratio
                        na, ## na = number of ages
                        ns, ## ns = number of stages
-                       parity = TRUE, 
+                       Parity, 
                        sex_Focal, ## binary "F" or "M"
                        stage_Focal){
   
@@ -40,26 +40,30 @@ all_kin_dy <- function(Uf,
   ##                                                            (1+n):2n gives the male age*stage structure
   population_age_stage_structure <- SD(Uproj + Fprojstar)
   
-  if(!parity){
-      population_age_stage_of_parenting <- pi_mix(Uf, Um, Ff, Fm, alpha, na, ns)
-      mothers_age_stage <- population_age_stage_of_parenting[[2]]
-      fathers_age_stage <- population_age_stage_of_parenting[[3]]
-    
-      parents_ages <- pi_age(Uf, Um, Ff, Fm, alpha, na, ns)
-      mothers_age_dist <- parents_ages[[1]]
-      fathers_age_dist <- parents_ages[[2]]
-    }
-  else{
+  
+  if(Parity){
       stage_Focal <- 1
       
-      population_age_stage_of_parenting <- pi_mix_parity(Uf, Um, Ff, Fm, alpha, na, ns)
+      population_age_stage_of_parenting <- pi_mix_parity2(Uf, Um, Ff, Fm, alpha, na, ns)
       mothers_age_stage <- population_age_stage_of_parenting[[2]]
       fathers_age_stage <- population_age_stage_of_parenting[[3]]
       
-      parents_ages <- pi_age_parity(Uf, Um, Ff, Fm, alpha, na, ns, mothers_age_stage, fathers_age_stage)
-      mothers_age_dist <- parents_ages[[1]]
-      fathers_age_dist <- parents_ages[[2]]
-    }
+      mothers_age_dist <- population_age_stage_of_parenting[[4]]
+      fathers_age_dist <- population_age_stage_of_parenting[[5]]
+      
+      #parents_ages <- pi_age_parity(Uf, Um, Ff, Fm, alpha, na, ns, mothers_age_stage, fathers_age_stage)
+      #mothers_age_dist <- parents_ages[[1]]
+      #fathers_age_dist <- parents_ages[[2]]
+  }
+  else{
+    population_age_stage_of_parenting <- pi_mix(Uf, Um, Ff, Fm, alpha, na, ns)
+    mothers_age_stage <- population_age_stage_of_parenting[[2]]
+    fathers_age_stage <- population_age_stage_of_parenting[[3]]
+    
+    parents_ages <- pi_age(Uf, Um, Ff, Fm, alpha, na, ns)
+    mothers_age_dist <- parents_ages[[1]]
+    fathers_age_dist <- parents_ages[[2]]
+  }
     
   ####################################### The dynamics of Kinship, starting with Focal who is no longer a unit vector
   ###############################################################################################################################
@@ -279,7 +283,7 @@ all_kin_dy_TV <- function(Uf,
                           alpha, 
                           na, 
                           ns, 
-                          parity = TRUE, 
+                          Parity, 
                           sex_Focal, 
                           stage_Focal,
                           previous_kin_Focal,
@@ -313,28 +317,31 @@ all_kin_dy_TV <- function(Uf,
   population_age_stage_structure <- population_age_stage_structure/sum(population_age_stage_structure)
   population_age_stage_structure_next <- (Uproj + Fprojstar)%*%population_age_stage_structure
 
-  if(!parity){
-    
-      population_age_stage_of_parenting <- pi_mix_TV(Ff, Fm, alpha, na, ns, population_age_stage_structure)
-      mothers_age_stage <- t(population_age_stage_of_parenting[[2]])
-      fathers_age_stage <- t(population_age_stage_of_parenting[[3]])
-    
-      parents_ages <- pi_age_TV(mothers_age_stage, fathers_age_stage, na, ns)
-      mothers_age_dist <- parents_ages[[1]]
-      fathers_age_dist <- parents_ages[[2]]
-    }
-  else{
+  if(Parity){
       stage_Focal <- 1
       
       population_age_stage_of_parenting <- pi_mix_TV_parity(Ff, Fm, alpha, na, ns, population_age_stage_structure)
       mothers_age_stage <- population_age_stage_of_parenting[[2]]
       fathers_age_stage <- population_age_stage_of_parenting[[3]]
       
-      parents_ages <- pi_age_TV(mothers_age_stage, fathers_age_stage, na, ns)
-      mothers_age_dist <- parents_ages[[1]]
-      fathers_age_dist <- parents_ages[[2]]
+      mothers_age_dist <- population_age_stage_of_parenting[[4]]
+      fathers_age_dist <- population_age_stage_of_parenting[[5]]
+      
+      #parents_ages <- pi_age_TV(mothers_age_stage, fathers_age_stage, na, ns)
+      #mothers_age_dist <- parents_ages[[1]]
+      #fathers_age_dist <- parents_ages[[2]]
     }
+  
+  else{
     
+    population_age_stage_of_parenting <- pi_mix_TV(Ff, Fm, alpha, na, ns, population_age_stage_structure)
+    mothers_age_stage <- population_age_stage_of_parenting[[2]]
+    fathers_age_stage <- population_age_stage_of_parenting[[3]]
+    
+    parents_ages <- pi_age_TV(mothers_age_stage, fathers_age_stage, na, ns)
+    mothers_age_dist <- parents_ages[[1]]
+    fathers_age_dist <- parents_ages[[2]]
+  }
   ########################################### Matrix projections for kinship
   ##############################################################################################################
   

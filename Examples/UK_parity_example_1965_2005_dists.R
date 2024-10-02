@@ -147,17 +147,17 @@ kin_out_1965_1985 <-
                          T_mat_fem[1:20],
                          T_mat_fem[1:20],
                          H_mat[1:20],
-                         alpha = 0.51, ## Sex ration -- UK value default
+                         alpha = 0.51, ## Sex ratio -- UK value 
                          parity = TRUE,
                          dist_output = TRUE,
-                         sex_Focal = "Female", ##  to do ::: define Focal's sex at birth -- change IC in Proj file
-                         stage_Focal = 1, ## Define FOcals stage at birth -- projection fiule
+                         sex_Focal = "Female", ##  define Focal's sex at birth 
+                         stage_Focal = 1, ## Define Focal's stage at birth 
                          seq(1965,(1965+20)))
 
 
-kin_out_1965_2005$group%>%unique()
+kin_out_1965_1985$group%>%unique()
 
-fig_out <- here::here("Figures")
+fig_out <- here::here("Figures","Distributions_for_kin")
 fs::dir_create(fig_out)
 
 parents_dist_fig <- kin_out_1965_1985%>%filter(group == "parents", 

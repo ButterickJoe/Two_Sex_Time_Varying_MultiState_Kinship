@@ -19,9 +19,9 @@ pi_mix <- function(Uf, Um, Ff, Fm, alpha, na, ns){
   F_block[ (1+n):(2*n), 1:n] <- alpha*Ff
   A <- block_diag_function(list(Uf,Um)) + F_block
   stable_dist_vec <- SD(A)
-  pi_f <-  t(rep(1,na*ns)%*%Ff)*stable_dist_vec[1:n] 
+  pi_f <-  t(rep(1, na*ns)%*%Ff)*stable_dist_vec[1:n] 
   pi_f <- pi_f / abs(sum(pi_f))
-  pi_m <-  t(rep(1,na*ns)%*%Fm)*stable_dist_vec[(1+n):(2*n)] 
+  pi_m <-  t(rep(1, na*ns)%*%Fm)*stable_dist_vec[(1+n):(2*n)] 
   pi_m <- pi_m / abs(sum(pi_m))
   return(list(c(pi_f,pi_m),pi_f,pi_m))
 }
@@ -42,6 +42,45 @@ pi_mix_parity <- function(Uf, Um, Ff, Fm, alpha, na, ns){
   return(list(c(pi_f,pi_m),pi_f,pi_m))
 }
 
+
+pi_mix_parity2 <- function(Uf, Um, Ff, Fm, alpha, na, ns){
+  n <- length(Uf[1,])
+  F_block <- as(matrix(0, nrow = n*2, ncol = n*2),"sparseMatrix")
+  F_block[1:n, 1:n] <- (1-alpha)*Ff
+  F_block[ (1+n):(2*n), 1:n] <- alpha*Ff
+  A <- block_diag_function(list(Uf,Um)) + F_block
+  stable_dist_vec <- SD(A)
+  pi_f <-  t(rep(1, na*ns)%*%Ff)*stable_dist_vec[1:n]
+  pi_f <- pi_f / abs(sum(pi_f))
+  pi_m <-  t(rep(1, na*ns)%*%Fm)*stable_dist_vec[(1+n):(2*n)]
+  pi_m <- pi_m / abs(sum(pi_m))
+  
+  Z <- diag(1, ns)
+  Z[1,1] <- 0
+  Iom <- diag(1, na)
+  onesa  <- t(rep(1,na))
+  ones <- t(rep(1,ns))
+  momarray <- pi_f %*% onesa
+  dadarray <- pi_m %*% onesa
+  
+  piage_f  <- kronecker(Iom,ones) %*% pi_f
+  piage_m <- kronecker(Iom,ones) %*% pi_m
+  for(i in 1:na){
+    E <- Iom[,i] %*% t(Iom[i,])
+    momarray[,i] <- kronecker(E,Z) %*% momarray[,i]
+    dadarray[,i] <- kronecker(E,Z) %*% dadarray[,i]
+  }
+  momarray <- momarray %*% MASS::ginv(diag(colSums(momarray)))
+  dadarray <- dadarray %*% MASS::ginv(diag(colSums(dadarray)))
+  # no 0 parity mothers: (momarray %*% piage)[seq(1,600,6)]
+  pi_f <- momarray %*% piage_f
+  pi_m <- dadarray %*% piage_m
+  
+  
+  return(list(c(pi_f,pi_m), pi_f, pi_m, piage_f, piage_m))
+}
+
+
 pi_mix_TV <- function(Ff, Fm, alpha, na, ns, previous_age_stage_dist){
   n <- length(Ff[1,])
   pi_f <-  t(rep(1,na*ns)%*%Ff)*previous_age_stage_dist[1:n] 
@@ -54,18 +93,38 @@ pi_mix_TV <- function(Ff, Fm, alpha, na, ns, previous_age_stage_dist){
 pi_mix_TV_parity <- function(Ff, Fm, alpha, na, ns, previous_age_stage_dist){
   n <- length(previous_age_stage_dist)
   pi_f <-  t(rep(1,na*ns)%*%Ff)*previous_age_stage_dist[1:(n/2)]
-  pi_f[seq(1, length(pi_f), ns)] <- 0
   pi_f <- pi_f / abs(sum(pi_f))
   pi_m <-  t(rep(1,na*ns)%*%Fm)*previous_age_stage_dist[(1+n/2):(n)]
-  pi_m[seq(1, length(pi_m), ns)] <- 0
   pi_m <- pi_m / abs(sum(pi_m))
-  return(list(c(pi_f,pi_m),pi_f,pi_m))
+  
+  Z <- diag(1, ns)
+  Z[1,1] <- 0
+  Iom <- diag(1, na)
+  onesa  <- t(rep(1,na))
+  ones <- t(rep(1,ns))
+  momarray <- pi_f %*% onesa
+  dadarray <- pi_m %*% onesa
+  
+  piage_f  <- kronecker(Iom,ones) %*% pi_f
+  piage_m <- kronecker(Iom,ones) %*% pi_m
+  for(i in 1:na){
+    E <- Iom[,i] %*% t(Iom[i,])
+    momarray[,i] <- kronecker(E,Z) %*% momarray[,i]
+    dadarray[,i] <- kronecker(E,Z) %*% dadarray[,i]
+  }
+  momarray <- momarray %*% MASS::ginv(diag(colSums(momarray)))
+  dadarray <- dadarray %*% MASS::ginv(diag(colSums(dadarray)))
+  # no 0 parity mothers: (momarray %*% piage)[seq(1,600,6)]
+  pi_f <- momarray %*% piage_f
+  pi_m <- dadarray %*% piage_m
+  
+  return(list(c(pi_f,pi_m),pi_f,pi_m,piage_f,piage_m))
 }
 
 ## Age-distributions as extracted from above
 pi_age <- function(Uf, Um, Ff, Fm, alpha, no_ages, no_stages){
-  pi_F <- kronecker( diag(no_ages), t(rep(1, no_stages)) )%*%t(pi_mix(Uf, Um, Ff, Fm, alpha)[[2]])
-  pi_M <- kronecker( diag(no_ages), t(rep(1, no_stages)) )%*%t(pi_mix(Uf, Um, Ff, Fm, alpha)[[3]])
+  pi_F <- kronecker( diag(no_ages), t(rep(1, no_stages)) )%*%(pi_mix(Uf, Um, Ff, Fm, alpha, no_ages, no_stages)[[2]])
+  pi_M <- kronecker( diag(no_ages), t(rep(1, no_stages)) )%*%(pi_mix(Uf, Um, Ff, Fm, alpha, no_ages, no_stages)[[3]])
   return(list(pi_F,pi_M))
 }
 
