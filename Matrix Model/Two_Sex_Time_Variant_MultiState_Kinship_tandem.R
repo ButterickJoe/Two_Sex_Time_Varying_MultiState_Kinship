@@ -22,7 +22,7 @@
  
 ## Import required functions and matrix operations
 source(here::here("Matrix Model", "Functions_required.R" ))
-source(here::here("Matrix Model", "Kin_projections.R" ))
+source(here::here("Matrix Model", "Kin_projections_tandem.R" ))
 
 
 kin_multi_stage_TV_2_sex_tandem <- function(U_list_females = NULL,

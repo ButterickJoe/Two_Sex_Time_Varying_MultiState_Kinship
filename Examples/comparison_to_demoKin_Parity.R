@@ -1,6 +1,6 @@
 
 
-source(here::here("Matrix Model" , "Two_Sex_Time_Variant_MultiState_Kinship.R"))
+source(here::here("Matrix Model" , "Two_Sex_Time_Variant_MultiState_Kinship_tandem.R"))
 
 ################# Historic sex-specific mortality rates
 U_list_F <- read_rds(here::here("Data",  "mort_mats_fem_1938_2070.Rds"))
@@ -52,7 +52,7 @@ T_mat_fem <- list()
 T_mat_male <- list()
 H_mat <- list()
 
-foreach(year = 1965:2022)%do%{
+foreach(year = 1965:1966)%do%{
   indx_year <- year - 1964
 
   fert_rates_fem <- as(matrix(0, nrow = na, ncol = ns), "sparseMatrix")
@@ -140,7 +140,7 @@ rm(U_list_M_truncated)
 gc()
 
 kin_out_1965_new <- 
-  kin_multi_stage_TV_2_sex(U_mat_fem[1:1], ## 40 years time-series of demographic rates (1965-2005) see last input...
+  kin_multi_stage_TV_2_sex_tandem(U_mat_fem[1:1], ## 40 years time-series of demographic rates (1965-2005) see last input...
                          U_mat_male[1:1],
                          F_mat_fem[1:1],
                          F_mat_male[1:1],
