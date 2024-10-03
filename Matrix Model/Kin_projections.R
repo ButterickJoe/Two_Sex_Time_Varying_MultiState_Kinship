@@ -51,18 +51,15 @@ all_kin_dy <- function(Uf,
       mothers_age_dist <- population_age_stage_of_parenting[[4]]
       fathers_age_dist <- population_age_stage_of_parenting[[5]]
       
-      #parents_ages <- pi_age_parity(Uf, Um, Ff, Fm, alpha, na, ns, mothers_age_stage, fathers_age_stage)
-      #mothers_age_dist <- parents_ages[[1]]
-      #fathers_age_dist <- parents_ages[[2]]
   }
   else{
     population_age_stage_of_parenting <- pi_mix(Uf, Um, Ff, Fm, alpha, na, ns)
     mothers_age_stage <- population_age_stage_of_parenting[[2]]
     fathers_age_stage <- population_age_stage_of_parenting[[3]]
     
-    parents_ages <- pi_age(Uf, Um, Ff, Fm, alpha, na, ns)
-    mothers_age_dist <- parents_ages[[1]]
-    fathers_age_dist <- parents_ages[[2]]
+    mothers_age_dist <- population_age_stage_of_parenting[[4]]
+    fathers_age_dist <- population_age_stage_of_parenting[[5]]
+    
   }
     
   ####################################### The dynamics of Kinship, starting with Focal who is no longer a unit vector
@@ -327,9 +324,6 @@ all_kin_dy_TV <- function(Uf,
       mothers_age_dist <- population_age_stage_of_parenting[[4]]
       fathers_age_dist <- population_age_stage_of_parenting[[5]]
       
-      #parents_ages <- pi_age_TV(mothers_age_stage, fathers_age_stage, na, ns)
-      #mothers_age_dist <- parents_ages[[1]]
-      #fathers_age_dist <- parents_ages[[2]]
     }
   
   else{
@@ -338,9 +332,9 @@ all_kin_dy_TV <- function(Uf,
     mothers_age_stage <- population_age_stage_of_parenting[[2]]
     fathers_age_stage <- population_age_stage_of_parenting[[3]]
     
-    parents_ages <- pi_age_TV(mothers_age_stage, fathers_age_stage, na, ns)
-    mothers_age_dist <- parents_ages[[1]]
-    fathers_age_dist <- parents_ages[[2]]
+    mothers_age_dist <- population_age_stage_of_parenting[[4]]
+    fathers_age_dist <- population_age_stage_of_parenting[[5]]
+    
   }
   ########################################### Matrix projections for kinship
   ##############################################################################################################

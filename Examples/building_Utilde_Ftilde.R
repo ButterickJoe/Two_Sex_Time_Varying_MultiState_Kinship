@@ -138,6 +138,7 @@ pi_mix(year_Utilde_F_list[[1]],year_Utilde_M_list[[1]],year_Ftilde_F_list[[1]],y
 pi_age(year_Utilde_F_list[[1]],year_Utilde_M_list[[1]],year_Ftilde_F_list[[1]],year_Ftilde_M_list[[1]],0.51,101,6)
 
 
+
 nn <- length(year_Utilde_F_list[[1]][1,])
 nn
 F_block1 <- as(matrix(0, nrow = nn*2, ncol = nn*2),"sparseMatrix")
@@ -146,9 +147,46 @@ F_block1[ (1+nn):(2*nn), 1:nn] <- 0.51*year_Ftilde_F_list[[1]]
 AA <- block_diag_function(list(year_Utilde_F_list[[1]],year_Utilde_M_list[[1]])) + F_block1
 stable_dist_vec1 <- SD(AA)
 stable_dist_vec1
-pi_ff <-  t(rep(1, 101*6)%*%year_Ftilde_F_list[[1]])*stable_dist_vec1[1:nn] 
-pi_ff <- pi_ff / abs(sum(pi_ff))
-pi_ff
-pi_mm <-  t(rep(1, 101*6)%*%year_Ftilde_M_list[[1]])*stable_dist_vec1[(1+nn):(2*nn)] 
-pi_mm <- pi_mm / abs(sum(pi_mm))
-c(pi_ff,pi_mm)
+### Joint distributions
+pi_f_J <-  t(rep(1, 101*6)%*%year_Ftilde_F_list[[1]])*stable_dist_vec1[1:nn]
+pi_f_J[seq(1, length(pi_f_J), 6)] <- 0
+pi_f_J <- pi_f_J / abs(sum(pi_f_J))
+
+pi_f_J
+seq(1,101*6,6)
+
+
+Z1 <- diag(1, 6)
+Z1[1,1] <- 0
+Iom1 <- diag(1, 101)
+onesa1  <- t(rep(1,101))
+ones1 <- t(rep(1,6))
+momarray1 <- pi_f_J %*% onesa1
+momarray1
+### Age distributions
+piage_f1  <- kronecker(Iom1,ones1) %*% pi_f_J
+piage_f1
+for(i in 1:101){
+  E2 <- Iom1[,i] %*% t(Iom1[i,])
+  E1 <- E_matrix(i,i,101,101)
+  momarray1[,i] <- kronecker(E1,Z1) %*% momarray1[,i]
+}
+momarray1 <- momarray1 %*% MASS::ginv(diag(colSums(momarray1)))
+### Joint distributions
+pi_f_D <- momarray1 %*% piage_f1
+
+plot(pi_f_D)
+plot(pi_f_J)
+max(pi_f_D-pi_f_J)
+
+min(E1-E2)
+
+
+plot((pi_f_J %*% onesa1)[1,])
+
+
+Iom1[,1] %*% t(Iom1[1,])
+
+
+
+
