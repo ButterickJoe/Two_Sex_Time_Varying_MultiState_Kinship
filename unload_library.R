@@ -1,0 +1,13 @@
+
+unloadNamespace("MASS")
+unloadNamespace("tidyverse")
+unloadNamespace("magrittr")
+unloadNamespace("viridisLite")
+unloadNamespace("dplyr")
+unloadNamespace("tidyr")
+unloadNamespace("ggplot2")
+unloadNamespace("foreach")
+unloadNamespace("future")
+unloadNamespace("reshape2")
+unloadNamespace("Matrix")
+unloadNamespace("matrixcalc")
