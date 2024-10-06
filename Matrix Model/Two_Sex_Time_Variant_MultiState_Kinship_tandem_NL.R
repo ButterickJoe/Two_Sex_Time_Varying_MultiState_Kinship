@@ -21,7 +21,7 @@
 #' @return A data frame with focal´s age, related ages, stages, sexes, and types of kin for each time-period
  
 ## Import required functions and matrix operations
-source(here::here("Matrix Model", "Functions_required_NL.R" ))
+source(here::here("Matrix Model", "Functions_required_NL1.R" ))
 source(here::here("Matrix Model", "Kin_projections_tandem_NL.R" ))
 
 
@@ -71,7 +71,7 @@ kin_multi_stage_TV_2_sex_tandem_NL <- function(U_list_females = NULL,
   ###                         2) -- project Focal and kin using above projection matrices
   
   pb <- progress::progress_bar$new(
-    format = "Running over input years [:bar] :percent",
+    format = "Timescale [:bar] :percent",
     total = no_years + 1, clear = FALSE, width = 60)
   tictoc::tic()
   for(year in 1:no_years){
@@ -121,28 +121,28 @@ kin_multi_stage_TV_2_sex_tandem_NL <- function(U_list_females = NULL,
     F_m_BDD <- block_diag_function(F_m_list) ## direct sum of male stage->stage reproductions, independent over age (na blocks)
     
     ## create the appropriate projection matrices
-    U_tilde_females <- Matrix::t(K_perm_mat(ns, na))%*%
-      U_f_BDD%*%
-      K_perm_mat(ns, na)%*%
+    U_tilde_females <- Matrix::t(K_perm_mat(ns, na)) %*%
+      U_f_BDD %*%
+      K_perm_mat(ns, na) %*%
       T_f_BDD
     
     ## create sex-specific age*stage projections
-    U_tilde_males <- Matrix::t(K_perm_mat(ns, na))%*%
-      U_m_BDD%*%
-      K_perm_mat(ns, na)%*%
+    U_tilde_males <- Matrix::t(K_perm_mat(ns, na)) %*%
+      U_m_BDD %*%
+      K_perm_mat(ns, na) %*%
       T_m_BDD
     
-    F_tilde_females <- Matrix::t(K_perm_mat(ns, na))%*%
-      H_BDD%*%
-      K_perm_mat(ns, na)%*%
+    F_tilde_females <- Matrix::t(K_perm_mat(ns, na)) %*%
+      H_BDD %*%
+      K_perm_mat(ns, na) %*%
       F_f_BDD
     
-    F_tilde_males <- Matrix::t(K_perm_mat(ns, na))%*%
-      H_BDD%*%
-      K_perm_mat(ns, na)%*%
+    F_tilde_males <- Matrix::t(K_perm_mat(ns, na)) %*%
+      H_BDD %*%
+      K_perm_mat(ns, na) %*%
       F_m_BDD
     
-    ## if year == 1 we are at the boundary condition t=0 --> time-invariant kinship projections
+    ## if year == 1 we are at the boundary condition t=0 apply time-invariant kinship projections
     if(year == 1){ 
       ## Output of the static model 
       kin_out_1 <- all_kin_dy_tandem_NL(U_tilde_females, 
@@ -215,7 +215,7 @@ kin_multi_stage_TV_2_sex_tandem_NL <- function(U_list_females = NULL,
                              updating_older_cousin,
                              updating_younger_cousin, 
                              updating_pop_struct)
-    ## Relative lists entries for t>0
+    ## Relative lists entries correspond to timescale periods (each entry an kin age*stage*2 by Focal age matrix)
     Focal_array[[(1+length(Focal_array))]] <- kin_out[[1]]
     daughter_array[[(1+length(daughter_array))]] <- kin_out[[2]]
     grand_daughter_array[[(1+length(grand_daughter_array))]] <- kin_out[[3]]

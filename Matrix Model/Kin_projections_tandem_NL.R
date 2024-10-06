@@ -1,7 +1,7 @@
 
 
 
-source(here::here("Matrix Model", "Functions_required_NL.R" ))
+source(here::here("Matrix Model", "Functions_required_NL1.R" ))
 
 ##################### Not time varying (boundary time = 0 kin output)
 
@@ -22,7 +22,6 @@ all_kin_dy_tandem_NL <- function(Uf,
   
   ## Uproj is a block diagonal matrix of block-structured Age*Stage matrices over sex...
   ## ...independently over sex transfers individuals across stage and up age
-  #Uproj <- as(block_diag_function(list(Uf, Um)),"sparseMatrix") ## ( block_diag_func in "Functions_required.R" )
   Uproj <- Matrix::Matrix(block_diag_function(list(Uf, Um)), sparse = TRUE)
   ## Fproj is a Sex-block-structured matrix of block-structured Age*Stage matrices where males and females BOTH reproduce (by stage)
   Fproj <- Matrix::Matrix(nrow = (2*n), ncol = (2*n), data = 0, sparse = TRUE)
@@ -102,13 +101,13 @@ all_kin_dy_tandem_NL <- function(Uf,
   
   ### projection all kin with deterministic initial conditions
   for(i in 1 : (na-1)){
-    X_Focal[,i+1] <- G_tilde%*%X_Focal[,i] 
-    X_parents[, i+1] <- Uproj%*%X_parents[, i] 
-    X_younger_sibs[,i+1] <- Uproj%*%X_younger_sibs[,i] + Fprojstar%*%X_parents[,i]
-    X_younger_niece_nephew[,i+1] <- Uproj%*%X_younger_niece_nephew[,i] + Fproj%*%X_younger_sibs[,i]
-    X_children[,i+1] <- Uproj%*%X_children[,i] + Fproj%*%X_Focal[,i] 
-    X_grand_children[,i+1] <- Uproj%*%X_grand_children[,i] + Fproj%*%X_children[,i]
-    X_great_grand_children[,i+1] <- Uproj%*%X_great_grand_children[,i] + Fproj%*%X_grand_children[,i]
+    X_Focal[,i+1] <- G_tilde %*% X_Focal[,i] 
+    X_parents[, i+1] <- Uproj %*% X_parents[, i] 
+    X_younger_sibs[,i+1] <- Uproj %*% X_younger_sibs[,i] + Fprojstar %*% X_parents[,i]
+    X_younger_niece_nephew[,i+1] <- Uproj %*% X_younger_niece_nephew[,i] + Fproj %*% X_younger_sibs[,i]
+    X_children[,i+1] <- Uproj %*% X_children[,i] + Fproj %*% X_Focal[,i] 
+    X_grand_children[,i+1] <- Uproj %*% X_grand_children[,i] + Fproj %*% X_children[,i]
+    X_great_grand_children[,i+1] <- Uproj %*% X_great_grand_children[,i] + Fproj %*% X_grand_children[,i]
   }
   
   ### IC for kin which are derived from above kin (Focal, parents, children, grand+great children, younger siblings, and younger nieces/nehpews): 
@@ -128,10 +127,10 @@ all_kin_dy_tandem_NL <- function(Uf,
   
   ### Projections of grand parenst, older sibs, younger aunts/uncles, older nieces/nephews
   for(i in 1: (na-1)){
-    X_grand_parents[, i+1] <- Uproj%*%X_grand_parents[, i] 
-    X_older_sibs[,i+1] <- Uproj%*%X_older_sibs[,i] 
-    X_older_niece_nephew[,i+1] <- Uproj%*%X_older_niece_nephew[,i] + Fproj%*%X_older_sibs[,i]
-    X_younger_aunts_uncles[,i+1] <- Uproj%*%X_younger_aunts_uncles[,i] + Fprojstar%*%X_grand_parents[,i]
+    X_grand_parents[, i+1] <- Uproj %*% X_grand_parents[, i] 
+    X_older_sibs[,i+1] <- Uproj %*% X_older_sibs[,i] 
+    X_older_niece_nephew[,i+1] <- Uproj %*% X_older_niece_nephew[,i] + Fproj %*% X_older_sibs[,i]
+    X_younger_aunts_uncles[,i+1] <- Uproj %*% X_younger_aunts_uncles[,i] + Fprojstar %*% X_grand_parents[,i]
   }
   
   ### IC for kin which are derived from above kin (older sibs, younger aunts/uncles, older nieces/nephews):
@@ -150,9 +149,9 @@ all_kin_dy_tandem_NL <- function(Uf,
   
   ## Projections of older unts/uncles, older cousins, younger cousins
   for(i in 1: (na-1)){
-    X_older_aunt_uncle[,i+1] <- Uproj%*%X_older_aunt_uncle[,i] 
-    X_older_cousins[,i+1] <- Uproj%*%X_older_cousins[,i] + Fproj%*%X_older_aunt_uncle[,i]
-    X_younger_cousins[,i+1] <- Uproj%*%X_younger_cousins[,i] + Fproj%*%X_younger_aunts_uncles[,i]
+    X_older_aunt_uncle[,i+1] <- Uproj %*% X_older_aunt_uncle[,i] 
+    X_older_cousins[,i+1] <- Uproj %*% X_older_cousins[,i] + Fproj %*% X_older_aunt_uncle[,i]
+    X_younger_cousins[,i+1] <- Uproj %*% X_younger_cousins[,i] + Fproj %*% X_younger_aunts_uncles[,i]
   }
 
   #### OUTPUT of all kin
@@ -203,7 +202,6 @@ all_kin_dy_TV_tandem_NL <- function(Uf,
                           previous_population_age_stage_structure){
   
   n <- nrow(Uf)
-  #Uproj <- block_diag_function(list(Uf,Um))
   Uproj <- Matrix::Matrix(block_diag_function(list(Uf, Um)), sparse = TRUE)
   Fproj <- Matrix::Matrix(nrow = (2*n), ncol = (2*n), data = 0, sparse = TRUE) 
   Fproj[1:n, 1:n] <- (1-alpha)*Ff
@@ -276,13 +274,13 @@ all_kin_dy_TV_tandem_NL <- function(Uf,
   X_parents[, 1] <- mothers_age_stage
   ### projection all above kin with deterministic initial conditions
   for(i in 1 : (na-1)){
-    X_Focal[,i+1] <- G_tilde%*%previous_kin_Focal[,i] 
-    X_parents[, i+1] <- Uproj%*%prev_kin_parents[, i] 
-    X_younger_sibs[,i+1] <- Uproj%*%prev_kin_younger_sibs[,i] + Fprojstar%*%prev_kin_parents[,i]
-    X_younger_niece_nephew[,i+1] <- Uproj%*%prev_kin_younger_niece_nephew[,i] + Fproj%*%prev_kin_younger_sibs[,i]
-    X_children[,i+1] <- Uproj%*%prev_kin_children[,i] + Fproj%*%previous_kin_Focal[,i] 
-    X_grand_children[,i+1] <- Uproj%*%prev_kin_grandchildren[,i] + Fproj%*%prev_kin_children[,i]
-    X_great_grand_children[,i+1] <- Uproj%*%prev_kin_greatgrandchildren[,i] + Fproj%*%prev_kin_grandchildren[,i]
+    X_Focal[,i+1] <- G_tilde %*% previous_kin_Focal[,i] 
+    X_parents[, i+1] <- Uproj %*% prev_kin_parents[, i] 
+    X_younger_sibs[,i+1] <- Uproj %*% prev_kin_younger_sibs[,i] + Fprojstar %*% prev_kin_parents[,i]
+    X_younger_niece_nephew[,i+1] <- Uproj %*% prev_kin_younger_niece_nephew[,i] + Fproj %*% prev_kin_younger_sibs[,i]
+    X_children[,i+1] <- Uproj %*% prev_kin_children[,i] + Fproj %*% previous_kin_Focal[,i] 
+    X_grand_children[,i+1] <- Uproj %*% prev_kin_grandchildren[,i] + Fproj %*% prev_kin_children[,i]
+    X_great_grand_children[,i+1] <- Uproj %*% prev_kin_greatgrandchildren[,i] + Fproj %*% prev_kin_grandchildren[,i]
   }
   
   ### IC for kin which are derived from above kin (Focal, parents, children, grand+great children, younger siblings, and younger nieces/nehpews): 
@@ -302,10 +300,10 @@ all_kin_dy_TV_tandem_NL <- function(Uf,
   
   ### Projections of older sibs, younger aunts/uncles, older nieces/nephews
   for(i in 1: (na-1)){
-    X_grand_parents[, i+1] <- Uproj%*%prev_kin_grand_parents[, i] 
-    X_older_sibs[,i+1] <- Uproj%*%prev_kin_older_sibs[,i] 
-    X_older_niece_nephew[,i+1] <- Uproj%*%prev_kin_older_niece_nephew[,i] + Fproj%*%prev_kin_older_sibs[,i]
-    X_younger_aunts_uncles[,i+1] <- Uproj%*%prev_kin_younger_aunts_uncles[,i] + Fprojstar%*%prev_kin_grand_parents[,i]
+    X_grand_parents[, i+1] <- Uproj %*% prev_kin_grand_parents[, i] 
+    X_older_sibs[,i+1] <- Uproj %*% prev_kin_older_sibs[,i] 
+    X_older_niece_nephew[,i+1] <- Uproj %*% prev_kin_older_niece_nephew[,i] + Fproj %*% prev_kin_older_sibs[,i]
+    X_younger_aunts_uncles[,i+1] <- Uproj %*% prev_kin_younger_aunts_uncles[,i] + Fprojstar %*% prev_kin_grand_parents[,i]
   }
   
   ### IC for kin which are derived from above kin (older sibs, younger aunts/uncles, older nieces/nephews):
@@ -324,9 +322,9 @@ all_kin_dy_TV_tandem_NL <- function(Uf,
   
   ## Projections of older unts/uncles, older cousins, younger cousins
   for(i in 1: (na-1)){
-    X_older_aunt_uncle[,i+1] <- Uproj%*%prev_kin_older_aunts_uncles[,i] 
-    X_older_cousins[,i+1] <- Uproj%*%prev_kin_older_cousins[,i] + Fproj%*%prev_kin_older_aunts_uncles[,i]
-    X_younger_cousins[,i+1] <- Uproj%*%prev_kin_younger_cousins[,i] + Fproj%*%prev_kin_younger_aunts_uncles[,i]
+    X_older_aunt_uncle[,i+1] <- Uproj %*% prev_kin_older_aunts_uncles[,i] 
+    X_older_cousins[,i+1] <- Uproj %*% prev_kin_older_cousins[,i] + Fproj %*% prev_kin_older_aunts_uncles[,i]
+    X_younger_cousins[,i+1] <- Uproj %*% prev_kin_younger_cousins[,i] + Fproj %*% prev_kin_younger_aunts_uncles[,i]
   }
   
   return(list(X_Focal,
