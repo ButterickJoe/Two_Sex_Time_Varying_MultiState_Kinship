@@ -40,7 +40,7 @@ Kin numbers -- i.e., summed over all ages of kin -- through variable "pred_no_ki
 kin numbers by age and stage of kin, and for each age of Focal.
 
 
-# Two_Sex_Time_Varying_MultiState_Kin_
+# Two_Sex_Time_Varying_MultiState_Kin_ALL
 
 Implements the above exactly the same, however does not need to call functions from other files -- all functions inculded in one 
 (very very long) script
