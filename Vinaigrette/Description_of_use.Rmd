@@ -155,6 +155,15 @@ H_mat: list of matrices which redistributes newborns to age-class 1 and parity 0
 
 Next we feed them into the matrix model
  starting from 1965 and up to 1985
+ 
+UK sex ration approx 0.51
+specific_kin = F -> we want all of Focal's network
+We are considering parity (parity = T)
+Focal is female!
+Accumulated kin in this example
+Focal stage = 1 (as born with no kids)
+age-increments by 1 year
+timescale from 1965-1985
 
 ```{r, message=FALSE, warning=FALSE}
 # Run kinship model for a female Focal over a timescale of no_years where
