@@ -9,11 +9,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, eval = F, include=FALSE}
-knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
-library(devtools); load_all()
-```
-
 In this vignette, we'll demonstrate how `Joe's code so far` can be used to compute kinship networks for an average member of a given population at a specific period in time, the sex of whom is user specified. 
 
 We call this individual Focal. We compute the number, age and parity distribution of Focal's relatives for each age of Focal's life,
