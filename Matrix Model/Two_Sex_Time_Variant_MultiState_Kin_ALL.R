@@ -897,17 +897,7 @@ RD <- function(PM) {
   vec_lambda <- spectral_stuff/sum(spectral_stuff)
   return(vec_lambda)}
 
-## The marginal stage distribution (i.e., summing over all ages)
-marg_stage_dist <- function(no_ages, no_stages, full_dist){
-  return(kronecker( Matrix::t(rep(1, no_ages)) , Matrix::diag(no_stages) ) %*% full_dist)}
-
-# The marginal age dist (i.e., summing over all stages)
-marg_age_dist <- function(no_ages, no_stages, full_dist){
-  return(kronecker( Matrix::diag(no_ages) , Matrix::t(rep(1, no_stages)) ) %*% full_dist)
-}
-
-## Matirx operations -- defining the vec permutation martix 
-
+## K permutation matrix
 e_vector <- function(i, n){
   e <- rep(0, n)
   e[i] <- 1
