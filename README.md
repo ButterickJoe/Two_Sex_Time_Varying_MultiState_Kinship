@@ -1,4 +1,4 @@
-# Two_Sex_Time_Varying_MultiState_Kinship
+# Two_Sex_Time_Varying_MultiState_Kin
 
 Code to implement a combination of Hall Caswell's formal demography of kinship models: volumes II,III,IV; two-sex, multi-state kinship 
 subject to time-varying demographic rates.
@@ -38,4 +38,11 @@ Kin numbers -- i.e., summed over all ages of kin -- through variable "pred_no_ki
 2) If one wishes the distribution of kin "dist_output == TRUE", then for each year we have
 
 kin numbers by age and stage of kin, and for each age of Focal.
-  
+
+
+# Two_Sex_Time_Varying_MultiState_Kin_
+
+Implements the above exactly the same, however does not need to call functions from other files -- all functions inculded in one 
+(very very long) script
+
+
