@@ -13,6 +13,7 @@
 #' @param H_list redistributes newborns across each stage to a specific age-class 
 #' @param alpha numeric. Female portion at birth.
 #' @param parity logical. parity states imply age distribution of mothers re-scaled to not have parity 0 when Focal born. Default `TRUE`.
+#' @param specific_kin vector. A vector of particular kin one wishes to obtain results for, e.g., c("m","d","oa"). Default is all kintypes.
 #' @param dist_output logical. Results as a data frame of accumulated kin by age of Focal if FALSE, and kin by their age*stage distribution by age of Focal if TRUE.
 #' @param sex_Focal character. Female or Male as the user requests
 #' @param stage_Focal Numeric in Natural number set {1,2,...,}. The stage which Focal is born into (e.g., 1 for parity 0)
@@ -21,8 +22,8 @@
 #' @return A data frame with focal´s age, related ages, stages, sexes, and types of kin for each time-period
  
 ## Import required functions and matrix operations
-source(here::here("Matrix Model", "Functions_required_NL1.R" ))
-source(here::here("Matrix Model", "Kin_projections_tandem_NL.R" ))
+source(here::here("Matrix Model", "Functions_required.R" ))
+source(here::here("Matrix Model", "Kin_projections.R" ))
 
 
 kin_multi_stage_TV_2_sex_tandem_NL <- function(U_list_females = NULL,

@@ -1,12 +1,14 @@
+
+
 ## Define a function which composes a direct sum from a list of matrices (ie. a block diagonal matrix)
 block_diag_function <- function(mat_list){
   s = length(mat_list)
   u1 = mat_list[[1]]
   dims <- dim(u1)
   r = dims[1]
-  diagmat <- as(matrix(0, nrow = r*s, ncol = r*s, byrow = TRUE),"sparseMatrix")
-  foreach(i = 1:s)%do%{
-    diagmat = diagmat + kronecker(E_matrix(i,i,s,s), mat_list[[i]])
+  diagmat <- Matrix::Matrix(nrow = (r*s), ncol = (r*s), data = 0, sparse = TRUE)
+  for(i in 1:s){
+      diagmat = diagmat + kronecker(E_matrix(i,i,s,s), mat_list[[i]])
   }
   return(diagmat)
 }
@@ -15,77 +17,58 @@ block_diag_function <- function(mat_list){
 ## Non-parity case
 pi_mix <- function(Uf, Um, Ff, Fm, alpha, na, ns){
   n <- length(Uf[1,])
-  F_block <- as(matrix(0, nrow = n*2, ncol = n*2),"sparseMatrix")
+  F_block <- Matrix::Matrix(nrow = (2*n), ncol = (2*n), data = 0, sparse = TRUE)
   F_block[1:n, 1:n] <- (1-alpha)*Ff
   F_block[ (1+n):(2*n), 1:n] <- alpha*Ff
   A <- block_diag_function(list(Uf,Um)) + F_block
   stable_dist_vec <- SD(A)
   ### Joint distributions
-  pi_f <-  t(rep(1, na*ns)%*%Ff)*stable_dist_vec[1:n] 
+  pi_f <-  Matrix::t( rep(1, na*ns) %*% Ff )*stable_dist_vec[1:n] 
   pi_f <- pi_f / abs(sum(pi_f))
-  pi_m <-  t(rep(1, na*ns)%*%Fm)*stable_dist_vec[(1+n):(2*n)] 
+  pi_m <-  Matrix::t( rep(1, na*ns) %*% Fm )*stable_dist_vec[(1+n):(2*n)] 
   pi_m <- pi_m / abs(sum(pi_m))
   ### Age distributions
-  pi_F <- kronecker( diag(na), t(rep(1, ns)) )%*%(pi_f)
-  pi_M <- kronecker( diag(na), t(rep(1, ns)) )%*%(pi_m)
+  pi_F <- kronecker( diag(na), Matrix::t(rep(1, ns)) ) %*% (pi_f)
+  pi_M <- kronecker( diag(na), Matrix::t(rep(1, ns)) ) %*% (pi_m)
   return(list(c(pi_f,pi_m),pi_f,pi_m,pi_F,pi_M))
 }
 ## Time-varying analogue
 pi_mix_TV <- function(Ff, Fm, alpha, na, ns, previous_age_stage_dist){
   n <- length(Ff[1,])
   ### Joint distributions
-  pi_f <-  t(rep(1,na*ns)%*%Ff)*previous_age_stage_dist[1:n] 
+  pi_f <-  Matrix::t( rep(1,na*ns) %*% Ff )*previous_age_stage_dist[1:n] 
   pi_f <- pi_f / abs(sum(pi_f))
-  pi_m <-  t(rep(1,na*ns)%*%Fm)*previous_age_stage_dist[(1+n):(2*n)] 
+  pi_m <-  Matrix::t( rep(1,na*ns) %*% Fm )*previous_age_stage_dist[(1+n):(2*n)] 
   pi_m <- pi_m / abs(sum(pi_m))
   ### Age distributions
-  pi_F <- kronecker( diag(na), t(rep(1, ns)) )%*%(pi_f)
-  pi_M <- kronecker( diag(na), t(rep(1, ns)) )%*%(pi_m)
+  pi_F <- kronecker( diag(na), Matrix::t(rep(1, ns)) ) %*% (pi_f)
+  pi_M <- kronecker( diag(na), Matrix::t(rep(1, ns)) ) %*% (pi_m)
   return(list(c(pi_f,pi_m),pi_f,pi_m,pi_F,pi_M))
 }
 
-### Parity case 1) 
-pi_mix_parity <- function(Uf, Um, Ff, Fm, alpha, na, ns){
-  n <- length(Uf[1,])
-  F_block <- as(matrix(0, nrow = n*2, ncol = n*2),"sparseMatrix")
-  F_block[1:n, 1:n] <- (1-alpha)*Ff
-  F_block[ (1+n):(2*n), 1:n] <- alpha*Ff
-  A <- block_diag_function(list(Uf,Um)) + F_block
-  stable_dist_vec <- SD(A)
-  ### Joint distributions
-  pi_f <-  t(rep(1, na*ns)%*%Ff)*stable_dist_vec[1:n]
-  pi_f[seq(1, length(pi_f), ns)] <- 0
-  pi_f <- pi_f / abs(sum(pi_f))
-  pi_m <-  t(rep(1, na*ns)%*%Fm)*stable_dist_vec[(1+n):(2*n)]
-  pi_m[seq(1, length(pi_m), ns)] <- 0
-  pi_m <- pi_m / abs(sum(pi_m))
-  return(list(c(pi_f,pi_m),pi_f,pi_m))
-}
+
 ## Parity case, as used in DemoKin
 pi_mix_parity2 <- function(Uf, Um, Ff, Fm, alpha, na, ns){
   n <- length(Uf[1,])
-  F_block <- as(matrix(0, nrow = n*2, ncol = n*2),"sparseMatrix")
+  F_block <- Matrix::Matrix(nrow = (2*n), ncol = (2*n), data = 0, sparse = TRUE)
   F_block[1:n, 1:n] <- (1-alpha)*Ff
   F_block[ (1+n):(2*n), 1:n] <- alpha*Ff
   A <- block_diag_function(list(Uf,Um)) + F_block
   stable_dist_vec <- SD(A)
-  pi_f <-  t(rep(1, na*ns)%*%Ff)*stable_dist_vec[1:n]
+  pi_f <-  Matrix::t( rep(1, na*ns) %*% Ff )*stable_dist_vec[1:n]
   pi_f <- pi_f / abs(sum(pi_f))
-  pi_m <-  t(rep(1, na*ns)%*%Fm)*stable_dist_vec[(1+n):(2*n)]
+  pi_m <-  Matrix::t( rep(1, na*ns) %*% Fm )*stable_dist_vec[(1+n):(2*n)]
   pi_m <- pi_m / abs(sum(pi_m))
-  Z <- diag(1, ns)
-  Z[1,1] <- 0
-  marray <- pi_f %*% t(rep(1,na))
-  darray <- pi_m %*% t(rep(1,na))
-  pi_F  <- kronecker(diag(1, na), t(rep(1,ns))) %*% pi_f
-  pi_M <- kronecker(diag(1, na), t(rep(1,ns))) %*% pi_m
-  foreach(i = 1:na)%do%{
-    E <- E_matrix(i,i,na,na)
-    marray[,i] <- kronecker(E,Z) %*% marray[,i]
-    darray[,i] <- kronecker(E,Z) %*% darray[,i]
+  m_mat <- pi_f %*% Matrix::t(rep(1,na))
+  d_mat <- pi_m %*% Matrix::t(rep(1,na))
+  pi_F <- kronecker( diag(1, na), Matrix::t(rep(1,ns)) ) %*% pi_f
+  pi_M <- kronecker( diag(1, na), Matrix::t(rep(1,ns)) ) %*% pi_m
+  for(i in 1:na){
+    m_mat[,i] <- kronecker( E_matrix(i,i,na,na) , Matrix::diag( c(0, rep(1, ns-1)) ) ) %*% m_mat[,i]
+    d_mat[,i] <- kronecker( E_matrix(i,i,na,na) , Matrix::diag( c(0, rep(1, ns-1)) ) ) %*% d_mat[,i]
   }
-  out_mum <- marray %*% ginv(diag(colSums(marray)))
-  out_dad <- darray %*% ginv(diag(colSums(darray)))
+  out_mum <- m_mat %*% MASS::ginv(Matrix::diag(Matrix::colSums(m_mat)))
+  out_dad <- d_mat %*% MASS::ginv(Matrix::diag(Matrix::colSums(d_mat)))
   ### Joint distributions
   pi_f <- out_mum %*% pi_F
   pi_m <- out_dad %*% pi_M
@@ -94,23 +77,20 @@ pi_mix_parity2 <- function(Uf, Um, Ff, Fm, alpha, na, ns){
 ## Time-variant analogue
 pi_mix_TV_parity <- function(Ff, Fm, alpha, na, ns, previous_age_stage_dist){
   n <- length(Ff[1,])
-  pi_f <-  t(rep(1,na*ns)%*%Ff)*previous_age_stage_dist[1:n]
+  pi_f <-  Matrix::t( rep(1,na*ns) %*% Ff )*previous_age_stage_dist[1:n]
   pi_f <- pi_f / abs(sum(pi_f))
-  pi_m <-  t(rep(1,na*ns)%*%Fm)*previous_age_stage_dist[(1+n):(2*n)]
+  pi_m <-  Matrix::t( rep(1,na*ns) %*% Fm )*previous_age_stage_dist[(1+n):(2*n)]
   pi_m <- pi_m / abs(sum(pi_m))
-  Z <- diag(1, ns)
-  Z[1,1] <- 0
-  marray <- pi_f %*% t(rep(1,na))
-  darray <- pi_m %*% t(rep(1,na))
-  pi_F  <- kronecker(diag(1, na), t(rep(1,ns))) %*% pi_f
-  pi_M <- kronecker(diag(1, na), t(rep(1,ns))) %*% pi_m
-  foreach(i = 1:na)%do%{
-    E <- E_matrix(i,i,na,na)
-    marray[,i] <- kronecker(E,Z) %*% marray[,i]
-    darray[,i] <- kronecker(E,Z) %*% darray[,i]
+  m_mat <- pi_f %*% Matrix::t(rep(1,na))
+  d_mat <- pi_m %*% Matrix::t(rep(1,na))
+  pi_F  <- kronecker( Matrix::diag(1, na), Matrix::t(rep(1,ns)) ) %*% pi_f
+  pi_M <- kronecker( Matrix::diag(1, na), Matrix::t(rep(1,ns)) ) %*% pi_m
+  for(i in 1:na){
+    m_mat[,i] <- kronecker( E_matrix(i,i,na,na) , Matrix::diag( c(0, rep(1, ns-1)) ) ) %*% m_mat[,i]
+    d_mat[,i] <- kronecker( E_matrix(i,i,na,na) , Matrix::diag( c(0, rep(1, ns-1)) ) ) %*% d_mat[,i]
   }
-  out_mum <- marray %*% ginv(diag(colSums(marray)))
-  out_dad <- darray %*% ginv(diag(colSums(darray)))
+  out_mum <- m_mat %*% MASS::ginv(Matrix::diag(Matrix::colSums(m_mat)))
+  out_dad <- d_mat %*% MASS::ginv(Matrix::diag(Matrix::colSums(d_mat)))
   ### Joint distributions
   pi_f <- out_mum %*% pi_F
   pi_m <- out_dad %*% pi_M
@@ -120,9 +100,9 @@ pi_mix_TV_parity <- function(Ff, Fm, alpha, na, ns, previous_age_stage_dist){
 ######################################################### Some useful utility functions
 ## A matrix which projects Focal over age and stages
 get_G <- function(U, no_ages, no_stages){
-  sig <- t(rep(1,no_ages*no_stages))%*%U
-  diag <- diag(sig[1,])
-  G <- U%*%ginv(diag)
+  sig <- Matrix::t(rep(1,no_ages*no_stages)) %*% U
+  diag <- Matrix::diag(sig[1,])
+  G <- U %*% MASS::ginv(diag)
   return(G)
 }
 
@@ -135,7 +115,7 @@ lambda <- function(PM) {
 # stable age/stage distribution
 SD <- function(PM) {
   spectral_stuff <- eigen(PM)
-  spectral_stuff <- Re(spectral_stuff$vectors[,which.max(abs(spectral_stuff$values))])
+  spectral_stuff <- Re(spectral_stuff$vectors[, which.max(abs(spectral_stuff$values))])
   # normalise...
   vec_lambda <- spectral_stuff/sum(spectral_stuff)
   return(vec_lambda)}
@@ -143,18 +123,18 @@ SD <- function(PM) {
 # reproductive values as the (left) eigenvector -- lambda
 RD <- function(PM) {
   spectral_stuff <- eigen(t(PM))
-  spectral_stuff <- Re(spectral_stuff$vectors[,which.max(abs(spectral_stuff$values))])
+  spectral_stuff <- Re(spectral_stuff$vectors[, which.max(abs(spectral_stuff$values))])
   # normalise...
   vec_lambda <- spectral_stuff/sum(spectral_stuff)
   return(vec_lambda)}
 
 ## The marginal stage distribution (i.e., summing over all ages)
 marg_stage_dist <- function(no_ages, no_stages, full_dist){
-  return(kronecker(t(rep(1, no_ages)) , diag(no_stages))%*%full_dist)}
+  return(kronecker( Matrix::t(rep(1, no_ages)) , Matrix::diag(no_stages) ) %*% full_dist)}
 
 # The marginal age dist (i.e., summing over all stages)
 marg_age_dist <- function(no_ages, no_stages, full_dist){
-  return(kronecker(diag(no_ages) , t(rep(1, no_stages)) ) %*%full_dist)
+  return(kronecker( Matrix::diag(no_ages) , Matrix::t(rep(1, no_stages)) ) %*% full_dist)
 }
 
 ## Matirx operations -- defining the vec permutation martix 
@@ -166,17 +146,18 @@ e_vector <- function(i, n){
 }
 
 E_matrix <- function(i,j,n,m){
-  E <- matrix(0, nrow = n, ncol = m, byrow = TRUE)
+  #E <- matrix(0, nrow = n, ncol = m, byrow = TRUE)
+  E <- Matrix::Matrix(nrow = (n), ncol = (m), data = 0, sparse = TRUE)
   E[i,j] <- 1
   return(E)
   
 }
 
 K_perm_mat <- function(n,m){
-  perm = matrix(0, nrow = n*m, ncol = n*m, byrow = TRUE)
+  perm <- Matrix::Matrix(nrow = (n*m), ncol = (n*m), data = 0, sparse = TRUE)
   for(i in 1:n){
     for(j in 1:m){
-      perm = perm + kronecker( E_matrix(i,j,n,m) ,t( E_matrix(i,j,n,m) ) )
+      perm = perm + kronecker( E_matrix(i,j,n,m) , Matrix::t(E_matrix(i,j,n,m)) )
     }
   }
   return(perm)
