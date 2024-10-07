@@ -268,7 +268,7 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                          "coa")
   ## create a nice data frame output
   if(!dist_output){
-    kin_out <- create_cumsum_TV_NL(relative_data,
+    kin_out <- create_cumsum_df(relative_data,
                                 relative_names, 
                                 time_series[1]:time_series[length(time_series)], 
                                 time_series[1], 
@@ -277,7 +277,7 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                                 1,
                                 specific_kin)}
   else{
-  kin_out <- create_full_dists_TV_NL(relative_data,
+  kin_out <- create_full_dists_df(relative_data,
                               relative_names, 
                               time_series[1]:time_series[length(time_series)], 
                               time_series[1], 

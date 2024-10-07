@@ -365,9 +365,10 @@ all_kin_dy_TV <- function(Uf,
 ##        start_year = when we begin the time-series
 ##        na = number of ages
 ##        ns = number of stages
+##        nc = age increment (i.e., 1-year age-classes, or 5-year age-classes)
 
 ################################################## 1) Accumulated kin by age of Focal 
-create_cumsum_TV_NL <- function(dat_list, 
+create_cumsum_df <- function(dat_list, 
                              list_dists,
                              years, 
                              start_year, 
@@ -401,10 +402,10 @@ create_cumsum_TV_NL <- function(dat_list,
         dplyr::summarise(num = sum(value)) %>%
         dplyr::ungroup()
       both_kin <- both_kin %>% dplyr::transmute(Age_Focal = variable, 
-                                       Stage = as.factor(stage), 
+                                       Stage_Kin = as.factor(stage), 
                                        pred_no_kin = num,
                                        Sex = Sex)
-      both_kin$Age_Focal <- as.numeric(gsub("[^0-9.-]", "", both_kin$Age_Focal))-1
+      both_kin$Age_Focal <- as.numeric(gsub("[^0-9.-]", "", both_kin$Age_Focal)) - 1
       df <- both_kin
       df$year <- j
       df$group <- kin_member
@@ -422,7 +423,7 @@ create_cumsum_TV_NL <- function(dat_list,
   return(df_year_list)
 }
 ################################################## 2) Full age*stage distributions by age of Focal
-create_full_dists_TV_NL <- function(dat_list, 
+create_full_dists_df <- function(dat_list, 
                                  list_dists,
                                  years, 
                                  start_year, 
