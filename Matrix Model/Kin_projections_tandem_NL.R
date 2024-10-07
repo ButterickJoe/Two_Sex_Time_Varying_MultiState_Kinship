@@ -350,6 +350,10 @@ all_kin_dy_TV_tandem_NL <- function(Uf,
 
 ################### Turn the above output into nice data frames.
 
+## Use of "pipe" (don't understand the name, but hey)
+
+`%>%` <- magrittr::`%>%`
+
 ##### When running the model over a time-series, i use list comprehension: 
 ##### each additional list entry will give Focal's kinship network (over all ages of Focal's life) for the next time-period
 #### I transform these into period-specific data frames of 1) accumulated kin by age of Focal and 2) age*stage dists of kin by age of Focal
@@ -369,7 +373,8 @@ create_cumsum_TV_NL <- function(dat_list,
                              start_year, 
                              na, 
                              ns, 
-                             n_inc){
+                             n_inc,
+                             specific_kin){
   df_year_list <- list()
   for(j in years){
     ii <- as.numeric(j) - start_year + 1
@@ -411,6 +416,9 @@ create_cumsum_TV_NL <- function(dat_list,
   df_year_list <- do.call("rbind", df_year_list)
   df_year_list <- df_year_list %>% dplyr::mutate(cohort = as.numeric(year) - as.numeric(Age_Focal),
                                          cohort_factor = as.factor(cohort))
+  if(specific_kin != FALSE){
+    df_year_list <- df_year_list %>% dplyr::filter(group %in% specific_kin)
+  }
   return(df_year_list)
 }
 ################################################## 2) Full age*stage distributions by age of Focal
@@ -420,7 +428,8 @@ create_full_dists_TV_NL <- function(dat_list,
                                  start_year, 
                                  na, 
                                  ns, 
-                                 n_inc){
+                                 n_inc,
+                                 specific_kin){
   df_year_list <- list()
   for(j in years){
     ii <- as.numeric(j) - start_year + 1
@@ -460,6 +469,9 @@ create_full_dists_TV_NL <- function(dat_list,
   df_year_list <- do.call("rbind", df_year_list)
   df_year_list <- df_year_list %>% dplyr::mutate(cohort = as.numeric(year) - as.numeric(Age_Focal),
                                          cohort_factor = as.factor(cohort))
+  if(specific_kin != FALSE){
+    df_year_list <- df_year_list %>% dplyr::filter(group %in% specific_kin)
+  }
   return(df_year_list)
 }
 

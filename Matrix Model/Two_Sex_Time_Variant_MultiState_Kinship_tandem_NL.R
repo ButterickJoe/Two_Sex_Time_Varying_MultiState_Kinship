@@ -34,6 +34,7 @@ kin_multi_stage_TV_2_sex_tandem_NL <- function(U_list_females = NULL,
                                      H_list = NULL,
                                      alpha = 0.51, ## Sex ration -- UK value default
                                      parity = FALSE,
+                                     specific_kin = FALSE,
                                      dist_output = FALSE,
                                      sex_Focal = "Female",
                                      stage_Focal = NULL,
@@ -99,7 +100,7 @@ kin_multi_stage_TV_2_sex_tandem_NL <- function(U_list_females = NULL,
       H_mat[1,] <- 1
       H_list2[[(1+length(H_list2))]] <- H_mat
     }
-    foreach(age = 1:na)%do%{
+    for(age in 1:na){
       T_f <- T_data_f[[age]]
       T_m <- T_data_m[[age]]
       T_f_list[[(1+length(T_f_list))]] <- T_f
@@ -248,21 +249,22 @@ kin_multi_stage_TV_2_sex_tandem_NL <- function(U_list_females = NULL,
        older_niece_array,
        younger_cousin_array,
        older_cousin_array)
-  ## label the kin names
+  ## label the kin names to match DemoKin: 
+  ## "coa", "cya", "d", "gd", "ggd", "ggm", "gm", "m", "nos", "nys", "oa", "ya", "os", "ys")
   relative_names <- list("Focal",
-                         "offspring",
-                         "grand offspring", 
-                         "great grand offspring",
-                         "parents", 
-                         "grand parents" , 
-                         "younger siblings", 
-                         "older siblings", 
-                         "younger aunt/unlces" , 
-                         "older aunt/unlce",
-                         "younger niece/nephews",
-                         "older niece/nephews",
-                         "younger cousin",
-                         "older cousin")
+                         "d",
+                         "gd", 
+                         "ggd",
+                         "m", 
+                         "gm" , 
+                         "ys", 
+                         "os", 
+                         "ya" , 
+                         "oa",
+                         "nys",
+                         "nos",
+                         "cya",
+                         "coa")
   ## create a nice data frame output
   if(!dist_output){
     kin_out <- create_cumsum_TV_NL(relative_data,
@@ -271,7 +273,8 @@ kin_multi_stage_TV_2_sex_tandem_NL <- function(U_list_females = NULL,
                                 time_series[1], 
                                 no_ages, 
                                 no_stages, 
-                                1)}
+                                1,
+                                specific_kin)}
   else{
   kin_out <- create_full_dists_TV_NL(relative_data,
                               relative_names, 
@@ -279,7 +282,8 @@ kin_multi_stage_TV_2_sex_tandem_NL <- function(U_list_females = NULL,
                               time_series[1], 
                               no_ages, 
                               no_stages, 
-                              1)}
+                              1,
+                              specific_kin)}
   
   return(kin_out)
 }
