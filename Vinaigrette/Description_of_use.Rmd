@@ -135,9 +135,28 @@ for(year in 1965:2022){
   U_mat_male[[(1+length(U_mat_male))]] <- mort_rates_male
   H_mat[[(1+length(H_mat))]] <- H_redistribute
 }
+```
 
-## The lists are resp. labelled: U_mat_fem,U_mat_male,F_mat_fem,F_mat_male,T_mat_fem,T_mat_fem,H_mat 
+# The lists of period-specific demographic rates are created and labelled:
 
+U_mat_fem: list of age by stage matrices, entries give female probability of survival. List starting 1965 ending 2022
+
+U_mat_male: list of age by stage matrices, entries give female probability of survival. List starting 1965 ending 2022
+
+F_mat_fem: list of age by stage matrices, entries give female fert, starting 1965 ending 2022
+
+F_mat_male == F_mat_fem: list of age by stage matrices, entries give male fert, starting 1965 ending 2022
+
+T_mat_fem: list of lists of matrices: Each outer list entry is a list of matrices where each matrix gives age-specific probabilities a female moves up parity (inner list has length of number of age-classes). Outer list starting 1965 ending 2022
+
+T_mat_fem: list of lists of matrices: Each outer list entry is a list of matrices where each matrix gives age-specific probabilities a male moves up parity (inner list has length of number of age-classes). Outer list starting 1965 ending 2022 (we don't have parity-specific fert for males)
+
+H_mat: list of matrices which redistributes newborns to age-class 1 and parity 0.
+
+Next we feed them into the matrix model
+ starting from 1965 and up to 1985
+
+```{r, message=FALSE, warning=FALSE}
 # Run kinship model for a female Focal over a timescale of no_years where
 no_years <- 20
 # and we start projecting kin in 1965
@@ -163,6 +182,11 @@ kin_out_1965_1985 <-
 ### 1.2. Visualizing the distribution of kin ##################################
 
 Let us now visualize the distribution of relatives over Focal's lifecourse using the model output
+
+For an example, let's say we really want to understand the age*parity distributions of the accumulated number of
+aunts and uncles older than Focal's mother and father, for each age of Focal, and for each period in time from 1965-1985. Some people will do.
+
+We can visualise using the below code
 
 ```{r, fig.height=6, fig.width=8}
 kin_out_1965_1985 %>% 
