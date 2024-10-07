@@ -26,7 +26,7 @@ source(here::here("Matrix Model", "Functions_required.R" ))
 source(here::here("Matrix Model", "Kin_projections.R" ))
 
 
-kin_multi_stage_TV_2_sex_tandem_NL <- function(U_list_females = NULL,
+kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                                      U_list_males = NULL,
                                      F_list_females = NULL,
                                      F_list_males = NULL,
@@ -147,7 +147,7 @@ kin_multi_stage_TV_2_sex_tandem_NL <- function(U_list_females = NULL,
     ## if year == 1 we are at the boundary condition t=0 apply time-invariant kinship projections
     if(year == 1){ 
       ## Output of the static model 
-      kin_out_1 <- all_kin_dy_tandem_NL(U_tilde_females, 
+      kin_out_1 <- all_kin_dy(U_tilde_females, 
                               U_tilde_males , 
                               F_tilde_females, 
                               F_tilde_males, 
@@ -192,7 +192,7 @@ kin_multi_stage_TV_2_sex_tandem_NL <- function(U_list_females = NULL,
     updating_pop_struct <- changing_pop_struct[[year]]
     
     ## Output of the time-variant model 
-    kin_out <- all_kin_dy_TV_tandem_NL(U_tilde_females, 
+    kin_out <- all_kin_dy_TV(U_tilde_females, 
                              U_tilde_males, 
                              F_tilde_females, 
                              F_tilde_males, 

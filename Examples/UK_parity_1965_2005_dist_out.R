@@ -1,6 +1,7 @@
 
+source(here::here("Matrix Model" , "Two_Sex_Time_Variant_MultiState_Kinship.R"))
 
-source(here::here("Matrix Model" , "Two_Sex_Time_Variant_MultiState_Kinship_tandem_NL.R"))
+`%>%` <- magrittr::`%>%`
 
 ################# Historic sex-specific mortality rates
 U_list_F <- readr::read_rds(here::here("Data",  "mort_mats_fem_1938_2070.Rds"))
@@ -16,9 +17,12 @@ colnames(dat) <- c("Year", "Age", "m1", "m2", "m3", "m4", "m5")
 
 dat%>%head()
 dat %>% reshape2::melt(id=c("Year","Age")) %>%
-  ggplot2::ggplot(aes(x = Age, y = value, color = Year)) + 
-  geom_line(aes(group = factor(Year))) + facet_wrap(~variable) + theme_bw() +
-  scale_fill_viridis_c() + scale_colour_viridis_c()
+  ggplot2::ggplot(ggplot2::aes(x = Age, y = value, color = Year)) + 
+  ggplot2::geom_line(ggplot2::aes(group = factor(Year))) + 
+  ggplot2::facet_wrap(~variable) + 
+  ggplot2::theme_bw() +
+  ggplot2::scale_fill_viridis_c() + 
+  ggplot2::scale_colour_viridis_c()
 
 dat <- dat %>% dplyr::transmute(Year = Year,
                        Age = Age,
@@ -55,7 +59,7 @@ H_mat <- list()
 
 for(year in 1965:2022){
   indx_year <- year - 1964
-
+  
   fert_rates_fem <- Matrix::Matrix(nrow = na, ncol = ns, data = 0, sparse = TRUE)
   fert_rates_male <- Matrix::Matrix(nrow = na, ncol = ns, data = 0, sparse = TRUE)
   mort_rates_fem <- Matrix::Matrix(nrow = na, ncol = ns, data = 0, sparse = TRUE)
@@ -93,7 +97,7 @@ for(year in 1965:2022){
       
       fert_rates_fem[age,] <- c(p01,p12,p23,p34,p45,p45)
       fert_rates_male[age,] <- c(p01,p12,p23,p34,p45,p45)
-
+      
       
       T_female[1,1] <- 1 - p01
       T_female[2,2] <- 1 - p12
@@ -112,7 +116,7 @@ for(year in 1965:2022){
       T_trans_list_m[[(1+length(T_trans_list_m))]] <- T_male
       
     }
-
+    
   }
   
   padd_T_female_juvenile <- list()
@@ -143,132 +147,157 @@ rm(U_list_M_truncated)
 gc()
 
 kin_out_1965_2005_NL <- 
-  kin_multi_stage_TV_2_sex_tandem_NL(U_mat_fem[1:40], ## 40 years time-series of demographic rates (1965-2005) see last input...
-                         U_mat_male[1:40],
-                         F_mat_fem[1:40],
-                         F_mat_male[1:40],
-                         T_mat_fem[1:40],
-                         T_mat_fem[1:40],
-                         H_mat[1:40],
-                         alpha = 0.51, ## Sex ratio -- UK here
-                         parity = TRUE, ## this example uses parity
-                         dist_output = FALSE, ## here we only want to know accumulated kin by age of Focal
+  kin_multi_stage_TV_2_sex_tandem_NL(U_mat_fem[1:2],
+                         U_mat_male[1:2],
+                         F_mat_fem[1:2],
+                         F_mat_male[1:2],
+                         T_mat_fem[1:2],
+                         T_mat_fem[1:2],
+                         H_mat[1:2],
+                         alpha = 0.51, ## Sex ratio -- UK value 
+                         specific_kin = c("m"),
+                         parity = TRUE,
+                         dist_output = TRUE,
                          sex_Focal = "Female", ##  define Focal's sex at birth 
-                         stage_Focal = 1, ## Define Focals stage at birth -- if parity automatically set to 1
-                         seq(1965,(1965+40)))
+                         stage_Focal = 1, ## Define Focal's stage at birth 
+                         seq(1965,(1965+2)))
 
 
-
-fig_out <- here::here("Figures","Cumulated_kin")
+fig_out <- here::here("Figures","Distributions_for_kin")
 fs::dir_create(fig_out)
 
-parents_fig <- kin_out_1965_2005_NL %>% 
-  dplyr::filter(group == "parents", year %in% c(1965, 1973, 1981, 1989, 1997, 2005)) %>%
-  ggplot2::ggplot(aes(x = Age_Focal, y = pred_no_kin, color = Stage, fill = Stage)) +
-  geom_bar(position = "stack", stat = "identity") + facet_grid(Sex~year) +
-  scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + ylab("Parents") +
-  theme(legend.position = "top")
-parents_fig
-ggsave(paste0(fig_out, "/parents_example.png"), parents_fig, width = 8, height = 6)
+kin_out_1965_2005_NL$group%>%unique()
 
-kin_out_1965_2005 %>% 
-  dplyr::filter(group == "Focal", Sex == "Female", year == 1965) %>%
-  dplyr::select(Age_Focal,Stage,pred_no_kin)%>%
-  ggplot(aes(x = Age_Focal, y = pred_no_kin, color = Stage, fill = Stage)) +
-  geom_bar(position = "stack", stat = "identity") 
+parents_dist_fig <- kin_out_1965_2005_NL %>% 
+  dplyr::filter(group == "m", 
+                year %in% c(1965, 1973, 1981, 1989, 1997, 2005),
+                Age_Focal == 0) %>%
+  ggplot2::ggplot(ggplot2::aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
+  ggplot2::geom_bar(position = "stack", stat = "identity") + 
+  ggplot2::facet_grid(Sex~year) +
+  ggplot2::scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + 
+  ggplot2::theme_bw() +
+  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 
+  ggplot2::ylab("Parents") +
+  ggplot2::ggtitle("Focal age 0")
 
-g_parents_fig <- kin_out_1965_2005_NL %>% 
-  dplyr::filter(group == "grand parents", year %in% c(1965, 1973, 1981, 1989, 1997, 2005)) %>%
-  ggplot2::ggplot(aes(x = Age_Focal, y = pred_no_kin, color = Stage, fill = Stage)) +
+parents_dist_fig
+ggsave(paste0(fig_out, "/parents_dists_example.png"), parents_dist_fig)
+
+g_parents_dist_fig <- kin_out_1965_2005_NL %>% 
+  dplyr::filter(group == "grand parents", 
+                year %in% c(1965, 1973, 1981, 1989, 1997, 2005),
+                Age_Focal == 0) %>%
+  ggplot2::ggplot(aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
   geom_bar(position = "stack", stat = "identity") + facet_grid(Sex~year) +
   scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + theme_bw() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + ylab("Grand parents") +
-  theme(legend.position = "top")
-g_parents_fig
+  ggtitle("Focal age 0")
 
-ggsave(paste0(fig_out, "/grand_parents_example.png"), g_parents_fig, width = 8, height = 6)
+g_parents_dist_fig
+ggsave(paste0(fig_out, "/grand_parents_dists_example.png"), g_parents_dist_fig)
 
 
-offspring_fig <- kin_out_1965_2005_NL %>% 
-  dplyr::filter(group == "offspring", year %in% c(1965, 1973, 1981, 1989, 1997, 2005))%>%
-  ggplot2::ggplot(aes(x = Age_Focal, y = pred_no_kin, color = Stage, fill = Stage)) +
+offspring_dists_fig <- kin_out_1965_2005_NL %>% 
+  dplyr::filter(group == "offspring",
+                year %in% c(1965, 1973, 1981, 1989, 1997, 2005),
+                Age_Focal == 80) %>%
+  ggplot2::ggplot(aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
   geom_bar(position = "stack", stat = "identity") + facet_grid(Sex~year) +
   scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + theme_bw() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + ylab("Offspring") +
-  theme(legend.position = "top")
-offspring_fig
-ggsave(paste0(fig_out, "/offspring_example.png"), offspring_fig, width = 8, height = 6)
+  ggtitle("Focal age 80")
 
-g_offspring_fig <- kin_out_1965_2005_NL %>% 
-  dplyr::filter(group == "grand offspring", year %in% c(1965, 1973, 1981, 1989, 1997, 2005))%>%
-  ggplot2::ggplot(aes(x = Age_Focal, y = pred_no_kin, color = Stage, fill = Stage)) +
+offspring_dists_fig
+ggsave(paste0(fig_out, "/offspring_dists_example.png"), offspring_dists_fig)
+
+g_offspring_dists_fig <- kin_out_1965_2005_NL %>% 
+  dplyr::filter(group == "grand offspring",
+                year %in% c(1965, 1973, 1981, 1989, 1997, 2005),
+                Age_Focal == 80) %>%
+  ggplot2::ggplot(aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
   geom_bar(position = "stack", stat = "identity") + facet_grid(Sex~year) +
   scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + ylab("Grand offspring")+
-  theme(legend.position = "top")
-g_offspring_fig
-ggsave(paste0(fig_out, "/grand_offspring_example.png"), g_offspring_fig, width = 8, height = 6)
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + ylab("Grand offspring") +
+  ggtitle("Focal 80")
+g_offspring_dists_fig
+
+ggsave(paste0(fig_out, "/grand_offspring_dist_example.png"), g_offspring_dists_fig)
 
 
 
-o_au_fig <- kin_out_1965_2005_NL %>% 
-  dplyr::filter(group == "older aunt/unlce", year %in% c(1965, 1973, 1981, 1989, 1997, 2005))%>%
-  ggplot2::ggplot(aes(x = Age_Focal, y = pred_no_kin, color = Stage, fill = Stage)) +
+o_au_dists_fig <- kin_out_1965_2005_NL %>% 
+  dplyr::filter(group == "older aunt/unlce", 
+                year %in% c(1965, 1973, 1981, 1989, 1997, 2005),
+                Age_Focal == 30) %>%
+  ggplot2::ggplot(aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
   geom_bar(position = "stack", stat = "identity") + facet_grid(Sex~year) +
   scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + theme_bw() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + ylab("Older aunts and uncles") +
-  theme(legend.position = "top")
-o_au_fig
-ggsave(paste0(fig_out, "/older_aunt_uncle_example.png"), o_au_fig, width = 8, height = 6)
+  ggtitle("Focal 30")
+o_au_dists_fig
 
-y_au_fig <- kin_out_1965_2005_NL %>% 
-  dplyr::filter(group == "younger aunt/unlces", year %in% c(1965, 1973, 1981, 1989, 1997, 2005))%>%
-  ggplot2::ggplot(aes(x = Age_Focal, y = pred_no_kin, color = Stage, fill = Stage)) +
+ggsave(paste0(fig_out, "/older_aunt_uncle_dists_example.png"), o_au_dists_fig)
+
+y_au_dists_fig <- kin_out_1965_2005_NL %>% 
+  dplyr::filter(group == "younger aunt/unlces", 
+                year %in% c(1965, 1973, 1981, 1989, 1997, 2005),
+                Age_Focal == 30) %>%
+  ggplot2::ggplot(aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
   geom_bar(position = "stack", stat = "identity") + facet_grid(Sex~year) +
   scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + theme_bw() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + ylab("Younger aunts and uncles") +
-  theme(legend.position = "top")
-y_au_fig
-ggsave(paste0(fig_out, "/younger_aunt_uncle_example.png"), y_au_fig, width = 8, height = 6)
+  ggtitle("Focal 30")
+y_au_dists_fig
+ggsave(paste0(fig_out, "/younger_aunt_uncle_dists_example.png"), y_au_dists_fig)
 
-o_nn_fig <- kin_out_1965_2005_NL %>% 
-  dplyr::filter(group == "older niece/nephews", year %in% c(1965, 1973, 1981, 1989, 1997, 2005))%>%
-  ggplot2::ggplot(aes(x = Age_Focal, y = pred_no_kin, color = Stage, fill = Stage)) +
+o_nn_dists_fig <- kin_out_1965_2005_NL %>% 
+  dplyr::filter(group == "older niece/nephews", 
+                year %in% c(1965, 1973, 1981, 1989, 1997, 2005),
+                Age_Focal == 50) %>%
+  ggplot2::ggplot(aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
   geom_bar(position = "stack", stat = "identity") + facet_grid(Sex~year) +
   scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + theme_bw() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + ylab("Older nieces and nephews") +
-  theme(legend.position = "top")
-o_nn_fig
-ggsave(paste0(fig_out, "/older_niece_nephew_example.png"), o_nn_fig, width = 8, height = 6)
+  ggtitle("Focal 50")
+o_nn_dists_fig
 
-y_nn_fig <- kin_out_1965_2005_NL %>% 
-  dplyr::filter(group == "younger niece/nephews", year %in% c(1965, 1973, 1981, 1989, 1997, 2005))%>%
-  ggplot2::ggplot(aes(x = Age_Focal, y = pred_no_kin, color = Stage, fill = Stage)) +
+ggsave(paste0(fig_out, "/older_niece_nephew_dists_example.png"), o_nn_dists_fig)
+
+y_nn_dists_fig <- kin_out_1965_2005_NL %>% 
+  dplyr::filter(group == "younger niece/nephews", 
+                year %in% c(1965, 1973, 1981, 1989, 1997, 2005),
+                Age_Focal == 50) %>%
+  ggplot2::ggplot(aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
   geom_bar(position = "stack", stat = "identity") + facet_grid(Sex~year) +
   scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + theme_bw() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + ylab("Younger nieces and nephews")
-y_nn_fig
-ggsave(paste0(fig_out, "/younger_niece_nephew_example.png"), y_nn_fig)
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + ylab("Younger nieces and nephews") +
+  ggtitle("Focal 50")
+y_nn_dists_fig
+ggsave(paste0(fig_out, "/younger_niece_nephew_dists_example.png"), y_nn_dists_fig)
 
 
-oc_fig <- kin_out_1965_2005_NL %>% 
-  dplyr::filter(group == "older cousin", year %in% c(1965, 1973, 1981, 1989, 1997, 2005))%>%
-  ggplot2::ggplot(aes(x = Age_Focal, y = pred_no_kin, color = Stage, fill = Stage)) +
+oc_dists_fig <- kin_out_1965_2005_NL %>% 
+  dplyr::filter(group == "older cousin", 
+                year %in% c(1965, 1973, 1981, 1989, 1997, 2005),
+                Age_Focal == 20) %>%
+  ggplot2::ggplot(aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
   geom_bar(position = "stack", stat = "identity") + facet_grid(Sex~year) +
   scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + theme_bw() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + ylab("Older cousins") +
-  theme(legend.position = "top")
+  ggtitle("Focal 20")
 
-oc_fig
-ggsave(paste0(fig_out, "/older_cousin_example.png"), oc_fig, width = 8, height = 6)
+oc_dists_fig
+ggsave(paste0(fig_out, "/older_cousin_dists_example.png"), oc_dists_fig)
 
-yc_fig <- kin_out_1965_2005_NL %>% 
-  dplyr::filter(group == "younger cousin", year %in% c(1965, 1973, 1981, 1989, 1997, 2005))%>%
-  ggplot2::ggplot(aes(x = Age_Focal, y = pred_no_kin, color = Stage, fill = Stage)) +
+yc_dists_fig <- kin_out_1965_2005_NL %>% 
+  dplyr::filter(group == "younger cousin",
+                year %in% c(1965, 1973, 1981, 1989, 1997, 2005),
+                Age_Focal == 20) %>%
+  ggplot2::ggplot(aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
   geom_bar(position = "stack", stat = "identity") + facet_grid(Sex~year) +
   scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + theme_bw() +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5)) + ylab("Younger cousins") +
-  theme(legend.position = "top")
-yc_fig
-ggsave(paste0(fig_out, "/younger_cousin_example.png"), yc_fig, width = 8, height = 6)
+  ggtitle("Focal 20")
+yc_dists_fig
+ggsave(paste0(fig_out, "/younger_cousin_dists_example.png"), yc_dists_fig)

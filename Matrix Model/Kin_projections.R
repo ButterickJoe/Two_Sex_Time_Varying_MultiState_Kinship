@@ -5,7 +5,7 @@ source(here::here("Matrix Model", "Functions_required.R" ))
 
 ##################### Not time varying (boundary time = 0 kin output)
 
-all_kin_dy_tandem_NL <- function(Uf, 
+all_kin_dy <- function(Uf, 
                               Um, 
                               Ff, 
                               Fm, 
@@ -175,7 +175,7 @@ all_kin_dy_tandem_NL <- function(Uf,
 
 ########################################## Now a time varying kin output -- all annotations the same as above
 
-all_kin_dy_TV_tandem_NL <- function(Uf, 
+all_kin_dy_TV <- function(Uf, 
                           Um, 
                           Ff, 
                           Fm, 
