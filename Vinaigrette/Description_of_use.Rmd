@@ -124,13 +124,13 @@ for(year in 1965:2022){
   padd_T_male_juvenile <- list()
   padd_T_female_juvenile <- lapply(1:(-1+age_min), function(x){padd_T_female_juvenile[[x]] <- T_no_ptrans})
   padd_T_male_juvenile <- lapply(1:(-1+age_min), function(x){padd_T_male_juvenile[[x]] <- T_no_ptrans})
-  padd_T_female_menapausal <- list()
-  padd_T_male_menapausal <- list()
-  padd_T_female_menapausal <- lapply((1+age_max):na, function(x){padd_T_female_menapausal[[x]] <- T_no_ptrans})
-  padd_T_male_menapausal <- lapply((1+age_max):na, function(x){padd_T_male_menapausal[[x]] <- T_no_ptrans})
+  padd_T_female_postmenopausal <- list()
+  padd_T_male_postmenopausal <- list()
+  padd_T_female_postmenopausal <- lapply((1+age_max):na, function(x){padd_T_female_postmenopausal[[x]] <- T_no_ptrans})
+  padd_T_male_postmenopausal <- lapply((1+age_max):na, function(x){padd_T_male_postmenopausal[[x]] <- T_no_ptrans})
   F_mat_fem[[(1+length(F_mat_fem))]] <- fert_rates_fem
   F_mat_male[[(1+length(F_mat_male))]] <- fert_rates_male
-  T_mat_fem[[(1+length(T_mat_fem))]] <- c(padd_T_female_juvenile, T_trans_list_f, padd_T_female_menapausal)
+  T_mat_fem[[(1+length(T_mat_fem))]] <- c(padd_T_female_juvenile, T_trans_list_f, padd_T_female_postmenopausal)
   U_mat_fem[[(1+length(U_mat_fem))]] <- mort_rates_fem
   U_mat_male[[(1+length(U_mat_male))]] <- mort_rates_male
   H_mat[[(1+length(H_mat))]] <- H_redistribute
