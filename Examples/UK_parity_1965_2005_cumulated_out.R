@@ -147,7 +147,7 @@ rm(U_list_M_truncated)
 gc()
 
 kin_out_1965_2005 <- 
-  kin_multi_stage_TV_2_sex_(U_mat_fem[1:40],
+  kin_multi_stage_TV_2_sex(U_mat_fem[1:40],
                          U_mat_male[1:40],
                          F_mat_fem[1:40],
                          F_mat_male[1:40],
@@ -171,7 +171,7 @@ kin_out_1965_1985$group%>%unique()
 
 kin_out_1965_1985 %>% head()
 
-parents_fig <- kin_out_1965_1985 %>% 
+parents_fig <- kin_out_1965_2005 %>% 
   dplyr::filter(group == "m", 
                 year %in% c(1965, 1970, 1975, 1980, 1985)) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
@@ -185,7 +185,7 @@ parents_fig <- kin_out_1965_1985 %>%
 parents_fig
 ggplot2::ggsave(paste0(fig_out, "/parents_accum_example.png"), parents_fig)
 
-g_parents_fig <- kin_out_1965_1985 %>% 
+g_parents_fig <- kin_out_1965_2005 %>% 
   dplyr::filter(group == "gm", 
                 year %in% c(1965, 1970, 1975, 1980, 1985)) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
@@ -200,7 +200,7 @@ g_parents_fig
 ggplot2::ggsave(paste0(fig_out, "/grand_parents_accum_example.png"), g_parents_fig)
 
 
-offspring_fig <- kin_out_1965_1985 %>% 
+offspring_fig <- kin_out_1965_2005 %>% 
   dplyr::filter(group == "d",
                 year %in% c(1965, 1970, 1975, 1980, 1985)) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
@@ -214,7 +214,7 @@ offspring_fig <- kin_out_1965_1985 %>%
 offspring_fig
 ggplot2::ggsave(paste0(fig_out, "/offspring_accum_example.png"), offspring_fig)
 
-g_offspring_fig <- kin_out_1965_1985 %>% 
+g_offspring_fig <- kin_out_1965_2005 %>% 
   dplyr::filter(group == "gd",
                 year %in% c(1965, 1970, 1975, 1980, 1985)) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
@@ -230,7 +230,7 @@ ggplot2::ggsave(paste0(fig_out, "/grand_offspring_accum_example.png"), g_offspri
 
 
 
-o_au_fig <- kin_out_1965_1985 %>% 
+o_au_fig <- kin_out_1965_2005 %>% 
   dplyr::filter(group == "oa", 
                 year %in% c(1965, 1970, 1975, 1980, 1985)) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
@@ -244,7 +244,7 @@ o_au_fig
 
 ggplot2::ggsave(paste0(fig_out, "/older_aunt_uncle_accum_example.png"), o_au_fig)
 
-y_au_fig <- kin_out_1965_1985 %>% 
+y_au_fig <- kin_out_1965_2005 %>% 
   dplyr::filter(group == "ya", 
                 year %in% c(1965, 1970, 1975, 1980, 1985)) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
@@ -257,7 +257,7 @@ y_au_fig <- kin_out_1965_1985 %>%
 y_au_fig
 ggplot2::ggsave(paste0(fig_out, "/younger_aunt_uncle_accum_example.png"), y_au_fig)
 
-o_nn_fig <- kin_out_1965_1985 %>% 
+o_nn_fig <- kin_out_1965_2005 %>% 
   dplyr::filter(group == "nos", 
                 year %in% c(1965, 1970, 1975, 1980, 1985)) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
@@ -271,7 +271,7 @@ o_nn_fig
 
 ggplot2::ggsave(paste0(fig_out, "/older_niece_nephew_accum_example.png"), o_nn_fig)
 
-y_nn_fig <- kin_out_1965_1985 %>% 
+y_nn_fig <- kin_out_1965_2005 %>% 
   dplyr::filter(group == "nys", 
                 year %in% c(1965, 1970, 1975, 1980, 1985)) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
@@ -285,7 +285,7 @@ y_nn_fig
 ggplot2::ggsave(paste0(fig_out, "/younger_niece_nephew_accum_example.png"), y_nn_fig)
 
 
-oc_fig <- kin_out_1965_1985 %>% 
+oc_fig <- kin_out_1965_2005 %>% 
   dplyr::filter(group == "coa", 
                 year %in% c(1965, 1970, 1975, 1980, 1985)) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
@@ -299,7 +299,7 @@ oc_fig <- kin_out_1965_1985 %>%
 oc_fig
 ggplot2::ggsave(paste0(fig_out, "/older_cousin_accum_example.png"), oc_fig)
 
-yc_fig <- kin_out_1965_1985 %>% 
+yc_fig <- kin_out_1965_2005 %>% 
   dplyr::filter(group == "cya",
                 year %in% c(1965, 1970, 1975, 1980, 1985)) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
