@@ -1,22 +1,23 @@
 
 
-#' Estimate kin counts by age and stage over two sexes, in a time variant framework
+#' Estimate kin counts by age, stage, and sex, in a time variant framework
 
-#' @description Implementation of combined formal demographic models of Caswell II,III,IV. 
+#' @description Implementation of combined formal demographic models: Caswell II,III,IV. 
 
-#' @param U_list_females -- list of matrices with elements: female probability of advancing age-class. Age in rows and states in columns. Each list entry ~ time-period.
-#' @param U_list_males -- list of matrices with elements: male probability of advancing age-class. Age in rows and states in columns. Each list entry ~ time-period.
-#' @param F_list_females list of matrices with elements: female state-specific fertility (age in rows and states in columns). Each list entry ~ time-period.
-#' @param F_list_males list of matrices with elements: male state-specific fertility (age in rows and states in columns). Each list entry ~ time-period.
-#' @param T_list_females list of matrices with elements: female probability of moving from one stage to another. Each list entry ~ time-period
-#' @param T_list_males list of matrices with elements: male probability of moving from one stage to another. Each list entry ~ time-period
-#' @param H_list redistributes newborns across each stage to a specific age-class 
-#' @param alpha numeric. Female portion at birth.
+#' @param U_list_females list with matrix entries: period-specific female survival probabilities. Age in rows and states in columns. 
+#' @param U_list_males list with matrix entries: period-specific male survival probabilities. Age in rows and states in columns.
+#' @param F_list_females list with matrix with elements: period-specific female fertility (age in rows and states in columns).
+#' @param F_list_males list with matrix entries: period-specific male fertility (age in rows and states in columns). 
+#' @param T_list_females list with matrix entries: period-specific female probability of transferring stage. 
+#' @param T_list_males list with matrix entries: period-specific male probability of transferring stage
+#' @param H_list list with matrix entries: redistribution of newborns across each stage to a specific age-class 
+#' @param alpha numeric. ratio of males to females in population
 #' @param parity logical. parity states imply age distribution of mothers re-scaled to not have parity 0 when Focal born. Default `TRUE`.
-#' @param specific_kin vector. A vector of particular kin one wishes to obtain results for, e.g., c("m","d","oa"). Default is all kintypes.
+#' @param specific_kin vector. A vector of particular kin one wishes to obtain results for, e.g., c("m","d","oa"). Default is all kin types.
 #' @param dist_output logical. Results as a data frame of accumulated kin by age of Focal if FALSE, and kin by their age*stage distribution by age of Focal if TRUE.
 #' @param sex_Focal character. Female or Male as the user requests
 #' @param stage_Focal Numeric in Natural number set {1,2,...,}. The stage which Focal is born into (e.g., 1 for parity 0)
+#' @param nc numeric. The age/time-increment used in the discretisation of the continuum. 
 #' @param time_series vector. The times at which we wish to count kin: start year = time_series[1], and end year = time_series[length.]
 #' 
 #' @return A data frame with focal´s age, related ages, stages, sexes, and types of kin for each time-period
@@ -39,6 +40,7 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                                      dist_output = FALSE,
                                      sex_Focal = "Female",
                                      stage_Focal = NULL,
+                                     nc = NULL,
                                      time_series){
   
   no_years <- length(U_list_females)
@@ -274,7 +276,7 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                                 time_series[1], 
                                 no_ages, 
                                 no_stages, 
-                                1,
+                                nc,
                                 specific_kin)}
   else{
   kin_out <- create_full_dists_df(relative_data,
@@ -283,7 +285,7 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                               time_series[1], 
                               no_ages, 
                               no_stages, 
-                              1,
+                              nc,
                               specific_kin)}
   
   return(kin_out)

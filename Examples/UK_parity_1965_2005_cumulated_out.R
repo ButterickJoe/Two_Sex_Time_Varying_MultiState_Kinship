@@ -146,8 +146,8 @@ rm(U_list_F_truncated)
 rm(U_list_M_truncated)
 gc()
 
-kin_out_1965_1985 <- 
-  kin_multi_stage_TV_2_sex(U_mat_fem[1:40],
+kin_out_1965_2005 <- 
+  kin_multi_stage_TV_2_sex_(U_mat_fem[1:40],
                          U_mat_male[1:40],
                          F_mat_fem[1:40],
                          F_mat_male[1:40],
@@ -160,6 +160,7 @@ kin_out_1965_1985 <-
                          dist_output = FALSE,
                          sex_Focal = "Female", ##  define Focal's sex at birth 
                          stage_Focal = 1, ## Define Focal's stage at birth 
+                         nc = 1,
                          seq(1965, (1965 + 40)))
 
 
