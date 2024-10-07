@@ -48,7 +48,7 @@ pi_mix_TV <- function(Ff, Fm, alpha, na, ns, previous_age_stage_dist){
 
 
 ## Parity case, as used in DemoKin
-pi_mix_parity2 <- function(Uf, Um, Ff, Fm, alpha, na, ns){
+pi_mix_parity <- function(Uf, Um, Ff, Fm, alpha, na, ns){
   n <- length(Uf[1,])
   F_block <- Matrix::Matrix(nrow = (2*n), ncol = (2*n), data = 0, sparse = TRUE)
   F_block[1:n, 1:n] <- (1-alpha)*Ff

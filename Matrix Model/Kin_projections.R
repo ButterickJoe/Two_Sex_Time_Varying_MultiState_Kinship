@@ -44,7 +44,7 @@ all_kin_dy <- function(Uf,
   if(Parity){
     stage_Focal <- 1
     
-    population_age_stage_of_parenting <- pi_mix_parity2(Uf, Um, Ff, Fm, alpha, na, ns)
+    population_age_stage_of_parenting <- pi_mix_parity(Uf, Um, Ff, Fm, alpha, na, ns)
     mothers_age_stage <- population_age_stage_of_parenting[[2]]
     fathers_age_stage <- population_age_stage_of_parenting[[3]]
     
