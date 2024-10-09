@@ -9,25 +9,41 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-In this vignette, we'll demonstrate how `Joe's code so far` can be used to compute kinship networks for an average member of a given population at a specific period in time, the sex of whom is user specified. We call this individual Focal. We compute the number, age and parity distribution of Focal's relatives for each age of Focal's life, and as a function of the year in which Focal is born. 
+In this vignette, we'll demonstrate how `Joe's code so far` can be used to compute parity-specific kinship networks for an average member of a given population, the sex of whom is user specified, subject to time-varying demographic rates. We call this individual Focal. 
+
+We will compute the number, age, and parity distribution of Focal's relatives for each age of Focal's life, and as a function of the year in which Focal is born. 
 
 ## Kin counts by parity ##########################################################################
 
-Here we use example data for the UK from 1965 - 2005. This data comes from the [Human Mortality Database](https://www.mortality.org/) and [Human Fertility Database](https://www.humanfertility.org/). Focal can potentially be born at any of these periods in time. Given this assumption, we calculate the kinship networks that emerge.
+In this example we use data for the UK ranging from 1965 - 2005. The data can be obtained from the [Human Mortality Database](https://www.mortality.org/) and [Human Fertility Database](https://www.humanfertility.org/). 
 
-In order to implement the model, the function `kin_multi_stage_TV_2_sex` expects the following demographic rates, fed in as lists:
+Some simplifying assumptions we make due to current data availability are
 
-1) LIST: Female age-and-parity specific survival probabilities over the timescale. The input list has length = the timescale, and each entry represents the rates of a specific period in matrix form: stage columns, age rows.
+i) Fertility rates vary with time, are distinct among parity class, but the same over sexes. I.e., we use the so-called ``androgynous approximation''.
+ii) Mortality rates vary with time and are distinct across sex, but are the same across parity class (I have not implemented parity-specific mortality)
+iii) The age-specific probabilities of parity-progression vary with time, but are the same over sex (androgynous approximation again)
 
-2) LIST: Male age-and-parity specific survival probabilities over the timescale. The input list has length = the timescale, and each entry represents the rates of a specific period in matrix form: stage columns, age rows.
 
-3) LIST: Female age-and-parity specific fertility rates over the timescale. The input list has length = the timescale, and each entry represents the rates of a specific period in matrix form: stage columns, age rows.
+In order to implement the model, the function `kin_multi_stage_TV_2_sex` expects the following 7 inputs, fed in as lists:
 
-4) LIST: Male age-and-parity specific fertility rates over the timescale. The input list has length = the timescale, and each entry represents the rates of a specific period in matrix form: stage columns, age rows.
+1) LIST: Female age-and-parity specific survival probabilities over the timescale. 
+This input list has length = the timescale, and each entry represents the rates of a specific period in matrix form: stage columns, age rows.
 
-5) OUTER LIST with INNER LISTS: Female age-specific probabilities of moving up parity over the timescale. The outer list has length = the timescale. The inner list has lenght = number of ages. Each outer list entry is comprised of a list of matrices (stage*stage dimensional), each matrix describes age-specific probabilities of moving stage. Thus for each year, we have a list of age-specific probabilities of moving from one stage to the next.
+2) LIST: Male age-and-parity specific survival probabilities over the timescale. 
+This input list has length = the timescale, and each entry represents the rates of a specific period in matrix form: stage columns, age rows.
+
+3) LIST: Female age-and-parity specific fertility rates over the timescale. 
+This input list has length = the timescale, and each entry represents the rates of a specific period in matrix form: stage columns, age rows.
+
+4) LIST: Male age-and-parity specific fertility rates over the timescale. 
+This input list has length = the timescale, and each entry represents the rates of a specific period in matrix form: stage columns, age rows.
+
+5) OUTER LIST with INNER LISTS: Female age-specific probabilities of moving up parity over the timescale. 
+The outer list has length = the timescale. The inner list has length = number of ages. Each outer list entry is comprised of a list of matrices (stage*stage dimensional), each matrix describes age-specific probabilities of moving stage. Thus for each year, we have a list of age-specific probabilities of moving from one stage to the next.
 
 6) Same as 5) but for males
+
+7) LIST: Length = timescale, and each element is a matrix which assigns the offspring of individuals in some stage to the appropriate age class (age in rows and states in columns)
 
 To avoid further calculations these lists are constructed in another file and simply imported below (See ``Examples'' , ``Matrix_construction'' for details)
 
