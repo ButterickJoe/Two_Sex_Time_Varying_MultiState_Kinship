@@ -180,7 +180,11 @@ the RHS simply refelcts the fact that Focal will not start reproduction until ar
 
 
 
-### 2. Now lets consider the distributions of kin Focal expects over the lifecourse (the abov)
+### 2. Now lets consider the distributions of kin Focal expects over the lifecourse (the above is simply a reduction of this more comprehensive output -- but takes slightly less time to run)
+
+To obtain distributions of kin as output, we simply change the function argument:
+dist_output = TRUE
+
 ```{r, message=FALSE, warning=FALSE}
 kin_out_1965_1985_full <- 
   kin_multi_stage_TV_2_sex(U_mat_fem[1:no_years],
