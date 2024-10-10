@@ -281,13 +281,13 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                                 specific_kin)}
   else{
   kin_out <- create_full_dists_df(relative_data,
-                              relative_names, 
-                              time_series[1]:time_series[length(time_series)], 
-                              time_series[1], 
-                              no_ages, 
-                              no_stages, 
-                              nc,
-                              specific_kin)}
+                                 relative_names, 
+                                 time_series[1]:time_series[length(time_series)], 
+                                 time_series[1], 
+                                 no_ages, 
+                                 no_stages, 
+                                 nc,
+                                 specific_kin)}
   
   return(kin_out)
 }
