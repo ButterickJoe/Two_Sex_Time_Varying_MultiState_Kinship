@@ -9,6 +9,12 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+
+```{R}
+options(dplyr.summarise.inform = FALSE)
+
+```
+
 In this vignette, we'll demonstrate how `Joe's code so far` can be used to compute parity-specific kinship networks for an average member of a given population, the sex of whom is user specified, subject to time-varying demographic rates. We call this individual Focal. 
 
 We will compute the number, age, and parity distribution of Focal's relatives for each age of Focal's life, and as a function of the year in which Focal is born. 
@@ -47,7 +53,8 @@ The outer list has length = the timescale. The inner list has length = number of
 
 To avoid further calculations these lists are constructed in another file and simply imported below (See ``Examples'' , ``Matrix_construction'' for details)
 
-```{r, message=FALSE, warning=FALSE}
+```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
+library(Matrix)
 
 # Lets construct these lists as model inputs..............
 `%>%` <- magrittr::`%>%`
@@ -116,7 +123,7 @@ kin_out_1965_1985 <-
                            dist_output = FALSE,
                            sex_Focal = "Female", ##  define Focal's sex at birth 
                            stage_Focal = 1, ## Define Focal's stage at birth 
-                           nc = 1,
+                           nc = 1, # width of age class
                            seq(1965, (1965 + no_years)))
 ```
 

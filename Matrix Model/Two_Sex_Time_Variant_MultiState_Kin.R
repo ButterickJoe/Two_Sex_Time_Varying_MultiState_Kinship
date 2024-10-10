@@ -46,6 +46,9 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
   no_years <- length(U_list_females)
   no_ages <- nrow(U_list_females[[1]])
   no_stages <- ncol(U_list_females[[1]])
+  ns <- no_stages
+  na <- no_ages
+  
   
   # Ensure inputs are lists of matrices and that the timescale same length
   if(length(U_list_females)!=length(time_series)){stop("Timescale inconsistancy")} 
