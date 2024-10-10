@@ -101,15 +101,15 @@ timescale from 1965-1985 -- > seq(1965, 1965 + 20)
 # Run kinship model for a female Focal over a timescale of no_years where
 no_years <- 20
 # and we start projecting kin in 1965
-# We decide here to count accumulated kin by age of Focal, and not distrubtions of kin
+# We decide here to count accumulated kin by age of Focal, and not distributions of kin
 kin_out_1965_1985 <- 
-  kin_multi_stage_TV_2_sex(U_mat_fem[1:no_years],
-                           U_mat_male[1:no_years],
-                           F_mat_fem[1:no_years],
-                           F_mat_male[1:no_years],
-                           T_mat_fem[1:no_years],
-                           T_mat_fem[1:no_years],
-                           H_mat[1:no_years],
+  kin_multi_stage_TV_2_sex(U_mat_fem[1:(1+no_years)],
+                           U_mat_male[1:(1+no_years)],
+                           F_mat_fem[1:(1+no_years)],
+                           F_mat_male[1:(1+no_years)],
+                           T_mat_fem[1:(1+no_years)],
+                           T_mat_fem[1:(1+no_years)],
+                           H_mat[1:(1+no_years)],
                            alpha = 0.51, ## Sex ratio -- UK value 
                            specific_kin = FALSE,
                            parity = TRUE,
@@ -223,8 +223,44 @@ kin_out_1965_1985_full %>%
   ggplot2::scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + 
   ggplot2::theme_bw() +
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 
-  ggplot2::ylab("Younger nieces and nephews") +
+  ggplot2::ylab("Younger siblings") +
   ggplot2::ggtitle("Focal 50")
 ```
 
-As expected, the discontinuity reflects the fact that Focal's younger siblings cannot be of age >=50
+As expected, the discontinuity reflects the fact that Focal's younger siblings cannot be of age >=50. Contrastingly, when we look at the age*stage distribution of older siblings, the discontinuity bounds kin to be of age >50, as plotted below
+
+```{r, fig.height = 6, fig.width = 8}
+kin_out_1965_1985_full %>% 
+  dplyr::filter(group == "os", 
+                year %in% c(1965, 1970, 1975, 1980, 1985),
+                Age_Focal == 50) %>%
+  ggplot2::ggplot(ggplot2::aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
+  ggplot2::geom_bar(position = "stack", stat = "identity") + 
+  ggplot2::facet_grid(Sex~year) +
+  ggplot2::scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + 
+  ggplot2::theme_bw() +
+  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 
+  ggplot2::ylab("Older siblings") +
+  ggplot2::ggtitle("Focal 50")
+```
+
+
+With a simple bit of playing with the output data frame, we can plot the age*stage distribution of the combined siblings of Focal
+
+
+```{r, fig.height = 6, fig.width = 8}
+kin_out_1965_1985_full %>% 
+  dplyr::filter((group == "ys" | group == "os"), 
+                year %in% c(1965, 1970, 1975, 1980, 1985),
+                Age_Focal == 50) %>%
+  tidyr::pivot_wider(names_from = group, values_from = pred_no_kin) %>%
+  dplyr::mutate(pred_no_kin = `ys` + `os`) %>%
+  ggplot2::ggplot(ggplot2::aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
+  ggplot2::geom_bar(position = "stack", stat = "identity") + 
+  ggplot2::facet_grid(Sex~year) +
+  ggplot2::scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + 
+  ggplot2::theme_bw() +
+  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 
+  ggplot2::ylab("All siblings") +
+  ggplot2::ggtitle("Focal 50")
+```

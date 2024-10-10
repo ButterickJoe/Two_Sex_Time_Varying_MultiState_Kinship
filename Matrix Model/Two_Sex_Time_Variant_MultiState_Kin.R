@@ -47,7 +47,8 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
   no_ages <- nrow(U_list_females[[1]])
   no_stages <- ncol(U_list_females[[1]])
   
-  # Ensure inputs are lists of matrices
+  # Ensure inputs are lists of matrices and that the timescale same length
+  if(length(U_list_females)!=length(time_series)){stop("Timescale inconsistancy")} 
   if(!is.list(U_list_females) | !is.list(U_list_males)) stop("U's must be a list with time-series length. Each list entry should be an age*stage dimensional matrix")
   if(!is.list(F_list_females) | !is.list(F_list_males)) stop("F's must be a list with time-series length. Each list entry should be an age*stage dimensional matrix")
   if(!is.list(T_list_females) | !is.list(T_list_males)) stop("T's must be a list with time-series length. Each list entry should be an age*stage dimensional matrix")
