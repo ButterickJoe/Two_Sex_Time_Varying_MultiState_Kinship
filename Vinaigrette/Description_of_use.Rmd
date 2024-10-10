@@ -143,12 +143,27 @@ kin_out_1965_1985 %>%
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 
   ggplot2::ylab("Older aunts and uncles") 
 ```
+We could consider any other kin in Focal's network, for instance, offspring
+
+```{r, fig.height=6, fig.width=8}
+kin_out_1965_1985 %>% 
+  dplyr::filter(group == "d", 
+                year %in% c(1965, 1970, 1975, 1980, 1985)) %>%
+  ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
+  ggplot2::geom_bar(position = "stack", stat = "identity") + 
+  ggplot2::facet_grid(Sex~year) +
+  ggplot2::scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + 
+  ggplot2::theme_bw() +
+  ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 
+  ggplot2::ylab("Offspring") 
+```
+
 
 
 ### 1.1.2. Plotting the kin of Focal as a function of Focal's cohort of birth #####
 
 Since we only ran the model for 20 years (between 1968-1985), there is very little scope to view kinship as cohort-specific. We can however compare cohorts for 20-year segments of Focal's life.
-Below we consider daughters
+Below, following from the above example, we once again consider daughters
 
 ```{r, fig.height = 6, fig.width = 8}
 kin_out_1965_1985 %>% 
@@ -158,7 +173,7 @@ kin_out_1965_1985 %>%
   ggplot2::facet_grid(Sex~cohort)  + 
   ggplot2::theme_bw() +
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 
-  ggplot2::ylab("Daughters") 
+  ggplot2::ylab("Offspring") 
 ```
 For example, the LHS plot should be interpreted as follows:
 
