@@ -196,21 +196,24 @@ To obtain distributions of kin as output, we simply change the function argument
 dist_output = TRUE
 
 ```{r, message=FALSE, warning=FALSE}
-kin_out_1965_1985_full <- 
-  kin_multi_stage_TV_2_sex(U_mat_fem[1:no_years],
-                           U_mat_male[1:no_years],
-                           F_mat_fem[1:no_years],
-                           F_mat_male[1:no_years],
-                           T_mat_fem[1:no_years],
-                           T_mat_fem[1:no_years],
-                           H_mat[1:no_years],
+rm(kin_out_1965_2005)
+gc()
+
+kin_out_1965_2005_full <- 
+  kin_multi_stage_TV_2_sex(U_mat_fem[1:(1+no_years)],
+                           U_mat_male[1:(1+no_years)],
+                           F_mat_fem[1:(1+no_years)],
+                           F_mat_male[1:(1+no_years)],
+                           T_mat_fem[1:(1+no_years)],
+                           T_mat_fem[1:(1+no_years)],
+                           H_mat[1:(1+no_years)],
                            alpha = 0.51, ## Sex ratio -- UK value 
                            specific_kin = FALSE,
                            parity = TRUE,
                            dist_output = TRUE,
                            sex_Focal = "Female", ##  define Focal's sex at birth 
                            stage_Focal = 1, ## Define Focal's stage at birth 
-                           nc = 1,
+                           nc = 1, ## age-increment 
                            seq(1965, (1965 + no_years)))
 ```
 
@@ -220,12 +223,12 @@ Let us now visualize the distribution of relatives over Focal's lifecourse using
 
 ### 2.1.1. Plotting kin distributions for an average Focal of fixed age, at some fixed period in time ###
 
-Below I plot the expected age*stage distribution of an average Focal's younger siblings over the years 1965, 1970, 1975, 1980 and 1985, given Focal is of age 50
+Below I plot the expected age*stage distribution of an average Focal's younger siblings over the years 1965, 1975, 1085, 1995, and 2005, given Focal is of age 50
 
 ```{r, fig.height = 6, fig.width = 8}
-kin_out_1965_1985_full %>% 
+kin_out_1965_2005_full %>% 
   dplyr::filter(group == "ys", 
-                year %in% c(1965, 1970, 1975, 1980, 1985),
+                year %in% c(1965, 1975, 1985, 1995, 2005),
                 Age_Focal == 50) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
   ggplot2::geom_bar(position = "stack", stat = "identity") + 
@@ -242,7 +245,7 @@ As expected, the discontinuity reflects the fact that Focal's younger siblings c
 ```{r, fig.height = 6, fig.width = 8}
 kin_out_1965_1985_full %>% 
   dplyr::filter(group == "os", 
-                year %in% c(1965, 1970, 1975, 1980, 1985),
+                year %in% c(1965, 1975, 1985, 1995, 2005),
                 Age_Focal == 50) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
   ggplot2::geom_bar(position = "stack", stat = "identity") + 
@@ -261,7 +264,7 @@ With a simple bit of playing with the output data frame, we can plot the age*sta
 ```{r, fig.height = 6, fig.width = 8}
 kin_out_1965_1985_full %>% 
   dplyr::filter((group == "ys" | group == "os"), 
-                year %in% c(1965, 1970, 1975, 1980, 1985),
+                year %in% c(1965, 1975, 1985, 1995, 2005),
                 Age_Focal == 50) %>%
   tidyr::pivot_wider(names_from = group, values_from = pred_no_kin) %>%
   dplyr::mutate(pred_no_kin = `ys` + `os`) %>%
