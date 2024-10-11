@@ -344,28 +344,24 @@ all_kin_dy_TV <- function(Uf,
               population_age_stage_structure_next))
 }
 
-
-
 ################## Create data frame output
 
-################### Turn the above output into nice data frames.
-
 ## Use of "pipe" (don't understand the name, but hey)
-
 `%>%` <- magrittr::`%>%`
 
-##### When running the model over a time-series, i use list comprehension: 
+##### When running the model over a time-series, I use list comprehension: 
 ##### each additional list entry will give Focal's kinship network (over all ages of Focal's life) for the next time-period
-#### I transform these into period-specific data frames of 1) accumulated kin by age of Focal and 2) age*stage dists of kin by age of Focal
+##### These are transformed into period-specific data frames of 1) accumulated kin by age of Focal 
+##                                                              2) age*stage dists of kin by age of Focal
 
 ## Arguments in the below functions: 
 ##        dat_list = a list of lists of matrices: list( list(X_foc), list(X_child), ... ) -- each list entry with year/age/sex specific kin distributions
-##        list_dist = a character list of which kin we want to analyse
+##        list_dist = a vector of kin we want to analyse if not FALSE which returns all
 ##        years = sequence of years in the time series
 ##        start_year = when we begin the time-series
 ##        na = number of ages
 ##        ns = number of stages
-##        nc = age increment (i.e., 1-year age-classes, or 5-year age-classes)
+##        n_inc = age increment (i.e., 1-year age-classes, or 5-year age-classes)
 
 ################################################## 1) Accumulated kin by age of Focal 
 create_cumsum_df <- function(dat_list, 

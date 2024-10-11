@@ -19,7 +19,7 @@
 #' @param dist_output logical. Results as a data frame of accumulated kin by age of Focal if FALSE, and kin by their age*stage distribution by age of Focal if TRUE.
 #' @param sex_Focal character. Female or Male as the user requests
 #' @param stage_Focal Numeric in Natural number set {1,2,...,}. The stage which Focal is born into (e.g., 1 for parity 0)
-#' @param nc numeric. The age/time-increment used in the discretisation of the continuum. 
+#' @param n_inc numeric. The age/time-increment used in the discretisation of the continuum. 
 #' @param time_series vector. The times at which we wish to count kin: start year = time_series[1], and end year = time_series[length.]
 #' 
 #' @return A data frame with focal´s age, related ages, stages, sexes, and types of kin for each time-period
@@ -42,7 +42,7 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                                      dist_output = FALSE, # Set to TRUE if we want a full age*stage distribution of kin 
                                      sex_Focal = "Female",
                                      stage_Focal = NULL,
-                                     nc = NULL, ## nc is the age-class, time-class increment (e.g., 1year,5year,10year)
+                                     n_inc = NULL, ## n_inc is the age-class, time-class increment (e.g., 1year,5year,10year)
                                      time_series){
   
   no_years <- length(U_list_females)
@@ -279,7 +279,7 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                                 time_series[1], 
                                 na, 
                                 ns, 
-                                nc,
+                                n_inc,
                                 specific_kin)}
   else{
   kin_out <- create_full_dists_df(relative_data,
@@ -288,7 +288,7 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                                  time_series[1], 
                                  na, 
                                  ns, 
-                                 nc,
+                                 n_inc,
                                  specific_kin)}
   
   return(kin_out)
