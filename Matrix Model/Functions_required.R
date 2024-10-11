@@ -99,8 +99,8 @@ pi_mix_TV_parity <- function(Ff, Fm, alpha, na, ns, previous_age_stage_dist){
 
 ######################################################### Some useful utility functions
 ## A matrix which projects Focal over age and stages
-get_G <- function(U, no_ages, no_stages){
-  sig <- Matrix::t(rep(1,no_ages*no_stages)) %*% U
+get_G <- function(U, na, ns){
+  sig <- Matrix::t(rep(1,na*ns)) %*% U
   diag <- Matrix::diag(sig[1,])
   G <- U %*% MASS::ginv(diag)
   return(G)
@@ -129,12 +129,12 @@ RD <- function(PM) {
   return(vec_lambda)}
 
 ## The marginal stage distribution (i.e., summing over all ages)
-marg_stage_dist <- function(no_ages, no_stages, full_dist){
-  return(kronecker( Matrix::t(rep(1, no_ages)) , Matrix::diag(no_stages) ) %*% full_dist)}
+marg_stage_dist <- function(na, ns, full_dist){
+  return(kronecker( Matrix::t(rep(1, na)) , Matrix::diag(ns) ) %*% full_dist)}
 
 # The marginal age dist (i.e., summing over all stages)
-marg_age_dist <- function(no_ages, no_stages, full_dist){
-  return(kronecker( Matrix::diag(no_ages) , Matrix::t(rep(1, no_stages)) ) %*% full_dist)
+marg_age_dist <- function(na, ns, full_dist){
+  return(kronecker( Matrix::diag(na) , Matrix::t(rep(1, ns)) ) %*% full_dist)
 }
 
 ## Matirx operations -- defining the vec permutation martix 

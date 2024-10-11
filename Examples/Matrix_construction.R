@@ -19,6 +19,7 @@ dat <- readxl::read_excel(here::here("Data", "Parity_births.xlsx"), sheet = "Tab
 dat <- dat[,c(2,3,16:20)]
 dat <- as.data.frame(dat)
 dat%>%head()
+dat$m5%>%min()
 ncol(dat)
 colnames(dat) <- c("Year", "Age", "m1", "m2", "m3", "m4", "m5")
 
@@ -38,17 +39,19 @@ dat <- dat %>% dplyr::transmute(Year = Year,
                                 m3 = as.numeric(m3)/1000,
                                 m4 = as.numeric(m4)/1000,
                                 m5 = as.numeric(m5)/1000)
-dat <- dat %>% dplyr::filter(Year > 1964)
-dat%>%head()
+dat <- dat %>% dplyr::filter(Year > 1964, Year < 2022)
+dat$Age%>%min()
+dat$Age%>%max()
+dat$m5[is.na(dat$m5)] <- 0
 
 
 start_time_matrix_list <- 1965 - 1938
-duration_time <- 2022 - 1965
+duration_time <- 2021 - 1965
 
 U_list_M_truncated <- U_list_M[start_time_matrix_list: (start_time_matrix_list + duration_time)] ## start 1970
 U_list_F_truncated <- U_list_F[start_time_matrix_list: (start_time_matrix_list + duration_time)]
 length(U_list_F_truncated)
-
+dat$Year%>%unique()%>%length()
 ## number of ages and stages
 na <- 101
 ns <- 6
@@ -64,7 +67,7 @@ T_mat_fem <- list()
 T_mat_male <- list()
 H_mat <- list()
 
-for(year in 1965:2022){
+for(year in 1965:2021){
   indx_year <- year - 1964
   
   fert_rates_fem <- Matrix::Matrix(nrow = na, ncol = ns, data = 0, sparse = TRUE)
@@ -156,4 +159,4 @@ saveRDS(F_mat_male, paste0(dat_out , "/" , "FM_list.Rds"))
 saveRDS(U_mat_fem, paste0(dat_out , "/" , "UF_list.Rds"))
 saveRDS(U_mat_male, paste0(dat_out , "/" , "UM_list.Rds"))
 saveRDS(T_mat_fem, paste0(dat_out , "/" , "T_list.Rds"))
-
+length(T_mat_fem)

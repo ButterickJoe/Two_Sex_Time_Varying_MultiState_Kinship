@@ -9,25 +9,26 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+Note that this is currently an R project and not package. To run code in this vignette we need to run/source all files in the folder ``Matrix Model''.
 
 ```{R}
 library(Matrix)
 library(tictoc)
+`%>%` <- magrittr::`%>%`
+source(here::here("Matrix Model" , "Two_Sex_Time_Variant_MultiState_Kin.R"))
 
-#options(dplyr.summarise.inform = FALSE) hide if we don't want to see summarise output (but also loose progress bar)
+options(dplyr.summarise.inform = FALSE) # hide if we don't want to see summarise output (but also #lose #progress bar)
 
 ```
 
-In this vignette, we'll demonstrate how `Two_Sex_Time_Varying_MultiState_Kinship` can be used to compute parity-specific kinship networks for an average member of a given population, the sex of whom is user specified, subject to time-varying demographic rates. We call this individual Focal. We seek the number, age, and parity distribution of Focal's relatives for each age of Focal's life as a function of the year in which Focal is born. 
+In this vignette, we'll demonstrate how `Two_Sex_Time_Varying_MultiState_Kinship` can be used to compute parity-specific kinship networks for an average member of a population, the sex of whom is user specified, and who is subject to time-varying demographic rates. We call this individual Focal. We seek the number, age, and parity distribution of Focal's relatives for each age of Focal's life as a function of the year in which Focal is born. 
 
 ## Kin counts by parity ##########################################################################
-
 In this example we use data for the UK ranging from 1965 - 2005, sourced from the [Human Mortality Database](https://www.mortality.org/) and [Human Fertility Database](https://www.humanfertility.org/). Some simplifying assumptions we make due to current data availability are as follows:
 
 i) Fertility rates vary with time, are distinct among parity class, but the same over sexes (the so-called ``androgynous approximation'').
 ii) Mortality rates vary with time and are distinct across sex, but are the same over parity classes (no parity-specific mortality)
 iii) The age-specific probabilities of parity-progression vary with time, but are the same over sex (androgynous approximation again)
-
 
 In order to implement the model, the function `kin_multi_stage_TV_2_sex` expects the following 7 inputs, fed in as lists:
 
@@ -55,8 +56,6 @@ To avoid further calculations these lists are constructed in another file and si
 ```{r eval=FALSE, message=FALSE, warning=FALSE, include=FALSE}
 
 # Lets construct these lists as model inputs..............
-`%>%` <- magrittr::`%>%`
-
 
 F_mat_fem <- readr::read_rds(here::here("Data","FF_list.Rds"))
 F_mat_male <- readr::read_rds(here::here("Data","FM_list.Rds"))
@@ -68,7 +67,6 @@ H_mat <- readr::read_rds(here::here("Data","H_list.Rds"))
 ```
 
 ## Recap: above are lists of period-specific demographic rates, in particular comprising:
-
 U_mat_fem: list of age by stage matrices, entries give female probability of survival. 
 List starting 1965 ending 2022
 
@@ -96,16 +94,15 @@ Focal is female --> sex_Focal = "Female"
 Accumulated kin in this example --> dist_output = FALSE
 Focal born into parity 0 --> stage_Focal = 1
 age-increments by 1 year --> nc = 1
-timescale from 1965-1985 -- > seq(1965, 1965 + 20)
+timescale from 1965-1985 -- > seq(1965, 1965 + 40)
 
 ### 1. For now lets simply consider the accumulated number of kin Focal expects over the lifecourse
-
 ```{r, message=FALSE, warning=FALSE}
 # Run kinship model for a female Focal over a timescale of no_years where
-no_years <- 20
+no_years <- 40
 # and we start projecting kin in 1965
 # We decide here to count accumulated kin by age of Focal, and not distributions of kin
-kin_out_1965_1985 <- 
+kin_out_1965_2005 <- 
   kin_multi_stage_TV_2_sex(U_mat_fem[1:(1+no_years)],
                            U_mat_male[1:(1+no_years)],
                            F_mat_fem[1:(1+no_years)],
@@ -126,19 +123,14 @@ kin_out_1965_1985 <-
 
 ### 1.1. Visualizing kin ##################################
 
-Let us now visualize the distribution of relatives over Focal's lifecourse using the model output
-
 ### 1.1.1. Plotting kin for an average Focal at some fixed period in time ###
 
-For an example, let's say we really want to understand the age*parity distributions of the accumulated number of
-aunts and uncles older than Focal's mother and father, for each age of Focal, and for each period in time from 1965-1985. Some people will do.
-
-We can visualise using the below code
+For an example, let's say we really want to understand the age*parity distributions of the accumulated number of aunts and uncles older than Focal's mother and father, for each age of Focal, and for each period in time from 1965-1985. Some people will do....
 
 ```{r, fig.height=6, fig.width=8}
-kin_out_1965_1985 %>% 
+kin_out_1965_2005 %>% 
   dplyr::filter(group == "oa", 
-                year %in% c(1965, 1970, 1975, 1980, 1985)) %>%
+                year %in% c(1965, 1975, 1985, 1995, 2005)) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
   ggplot2::geom_bar(position = "stack", stat = "identity") + 
   ggplot2::facet_grid(Sex~year) +
@@ -147,12 +139,13 @@ kin_out_1965_1985 %>%
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 
   ggplot2::ylab("Older aunts and uncles") 
 ```
-We could consider any other kin in Focal's network, for instance, offspring
+
+We could also consider any other kin in Focal's network, for instance, offspring
 
 ```{r, fig.height=6, fig.width=8}
-kin_out_1965_1985 %>% 
+kin_out_1965_2005 %>% 
   dplyr::filter(group == "d", 
-                year %in% c(1965, 1970, 1975, 1980, 1985)) %>%
+                year %in% c(1965, 1975, 1985, 1995, 2005)) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
   ggplot2::geom_bar(position = "stack", stat = "identity") + 
   ggplot2::facet_grid(Sex~year) +
@@ -163,15 +156,13 @@ kin_out_1965_1985 %>%
 ```
 
 
-
 ### 1.1.2. Plotting the kin of Focal as a function of Focal's cohort of birth #####
-
-Since we only ran the model for 20 years (between 1968-1985), there is very little scope to view kinship as cohort-specific. We can however compare cohorts for 20-year segments of Focal's life.
+Since we only ran the model for 40 years (between 1968-2005), there is very little scope to view kinship as cohort-specific. We can however compare cohorts for 40-year segments of Focal's life.
 Below, following from the above example, we once again consider offspring
 
 ```{r, fig.height = 6, fig.width = 8}
-kin_out_1965_1985 %>% 
-  dplyr::filter(group == "d", cohort %in% c(1900,1925,1950,1965) ) %>%
+kin_out_1965_2005 %>% 
+  dplyr::filter(group == "d", cohort %in% c(1910,1925,1965) ) %>%
   ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
   ggplot2::geom_bar(position = "stack", stat = "identity") + 
   ggplot2::facet_grid(Sex~cohort)  + 
@@ -179,7 +170,9 @@ kin_out_1965_1985 %>%
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 
   ggplot2::ylab("Offspring") 
 ```
-The LHS plot (1900 cohort) should be interpreted as follows: if Focal is born in 1900, between 1965-1985 he/she will be 65-85 years old; offspring will be around 30-45, have completed reproduction/parity progression, and will be experiencing mortality.
+The LHS plot (1910 cohort) should be interpreted as follows: if Focal is born in 1910, between 1965-2005 he/she will be 55-95 years old. Focal will have already accumulated its maximal number of offspring, and their overall number will now be dropping as mortality risk begins. The offspring of Focal will be approximately 20-35, and began if not completed reproduction/parity progression. 
+
+The middle plot (1925 cohort) shows Focal between ages 40 and 80. Again, Focal will have completed reproduction and can only lose offspring as he/she ages. However, Offspring at Focal of age 40 will be around 10-20 and still have high probability of being in partity 0. Whereas, Focal at age of 80 will have offspring aged around 50, who in turn will have completed reproduction as demonstrated by a well mixed parity-distribution at this age of Focal.
 
 the RHS plot (1965 cohort) simply reflects the fact that Focal will not start reproduction until around 15 years old.
 
