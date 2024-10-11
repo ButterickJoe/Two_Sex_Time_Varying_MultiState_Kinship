@@ -8,8 +8,10 @@
 #' @param U_list_males list with matrix entries: period-specific male survival probabilities. Age in rows and states in columns.
 #' @param F_list_females list with matrix with elements: period-specific female fertility (age in rows and states in columns).
 #' @param F_list_males list with matrix entries: period-specific male fertility (age in rows and states in columns). 
-#' @param T_list_females list with matrix entries: period-specific female probability of transferring stage. 
-#' @param T_list_males list with matrix entries: period-specific male probability of transferring stage
+#' @param T_list_females list of lists with matrix entries: each outer list entry is period-specific, and composed of 
+#'                     a list of stochastic matrices which describe age-specific female probabilities of transferring stage
+#' @param T_list_males list of lists with matrix entries: each outer list entry is period-specific, and composed of 
+#'                     a list of stochastic matrices which describe age-specific male probabilities of transferring stage
 #' @param H_list list with matrix entries: redistribution of newborns across each stage to a specific age-class 
 #' @param alpha numeric. ratio of males to females in population
 #' @param parity logical. parity states imply age distribution of mothers re-scaled to not have parity 0 when Focal born. Default `TRUE`.
@@ -34,27 +36,24 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                                      T_list_females = NULL,
                                      T_list_males = NULL,
                                      H_list = NULL,
-                                     alpha = 0.51, ## Sex ration -- UK value default
+                                     alpha = 0.51, ## Sex ratio -- UK value default
                                      parity = FALSE,
                                      specific_kin = FALSE,
-                                     dist_output = FALSE,
+                                     dist_output = FALSE, # Set to TRUE if we want a full age*stage distribution of kin 
                                      sex_Focal = "Female",
                                      stage_Focal = NULL,
-                                     nc = NULL,
+                                     nc = NULL, ## nc is the age-class, time-class increment (e.g., 1year,5year,10year)
                                      time_series){
   
   no_years <- length(U_list_females)
-  no_ages <- nrow(U_list_females[[1]])
-  no_stages <- ncol(U_list_females[[1]])
-  ns <- no_stages
-  na <- no_ages
-  
+  na <- nrow(U_list_females[[1]])
+  ns <- ncol(U_list_females[[1]])
   
   # Ensure inputs are lists of matrices and that the timescale same length
-  if(length(U_list_females)!=length(time_series)){stop("Timescale inconsistancy")} 
-  if(!is.list(U_list_females) | !is.list(U_list_males)) stop("U's must be a list with time-series length. Each list entry should be an age*stage dimensional matrix")
-  if(!is.list(F_list_females) | !is.list(F_list_males)) stop("F's must be a list with time-series length. Each list entry should be an age*stage dimensional matrix")
-  if(!is.list(T_list_females) | !is.list(T_list_males)) stop("T's must be a list with time-series length. Each list entry should be an age*stage dimensional matrix")
+  if(length(U_list_females)!=length(time_series)){stop("Timescale inconsistancy")} ## this is due to my struggles with counting! ( e.g., seq(10, 20, 1) != list(1 : 10) )
+  if(!is.list(U_list_females) | !is.list(U_list_males)){stop("U's must be a list with time-series length. Each list entry should be an age*stage dimensional matrix")}
+  if(!is.list(F_list_females) | !is.list(F_list_males)){stop("F's must be a list with time-series length. Each list entry should be an age*stage dimensional matrix")}
+  if(!is.list(T_list_females) | !is.list(T_list_males)){stop("T's must be a list with time-series length. Each list entry should be an age*stage dimensional matrix")}
 
   ### Define empty lists for the accumulated kin of Focals's life-course -- each list entry will reflect a time-period
   changing_pop_struct <- list()
@@ -158,8 +157,8 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                               F_tilde_females, 
                               F_tilde_males, 
                               alpha, 
-                              no_ages, 
-                              no_stages, 
+                              na, 
+                              ns, 
                               parity,
                               sex_Focal,
                               stage_Focal)
@@ -203,8 +202,8 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                              F_tilde_females, 
                              F_tilde_males, 
                              alpha, 
-                             no_ages, 
-                             no_stages,  
+                             na, 
+                             ns,  
                              parity,
                              sex_Focal,
                              stage_Focal,
@@ -278,8 +277,8 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                                 relative_names, 
                                 time_series[1]:time_series[length(time_series)], 
                                 time_series[1], 
-                                no_ages, 
-                                no_stages, 
+                                na, 
+                                ns, 
                                 nc,
                                 specific_kin)}
   else{
@@ -287,8 +286,8 @@ kin_multi_stage_TV_2_sex <- function(U_list_females = NULL,
                                  relative_names, 
                                  time_series[1]:time_series[length(time_series)], 
                                  time_series[1], 
-                                 no_ages, 
-                                 no_stages, 
+                                 na, 
+                                 ns, 
                                  nc,
                                  specific_kin)}
   
