@@ -52,22 +52,26 @@ test_that("same output in multi_stage (caswell 2020)", {
     dplyr::select(age_kin, stage_kin, age_focal, count) %>%
     dplyr::transmute(age_focal = age_focal, age_kin = age_kin, stage_kin = stage_kin, count = count)
   
-  expect_equal(jcmp_ys$count, hcmp_ys$count)
-  
-  jcmp_nys <- joe_output %>% dplyr::filter(sex_kin == "Female", group == "nys") %>%
+  ## Nieces through sisters
+  jcmp_os <- joe_output %>% dplyr::filter(sex_kin == "Female", group == "os") %>%
     dplyr::select(age_focal, age_kin, stage_kin, count) %>%
     dplyr::transmute(age_focal = age_focal, age_kin = age_kin, stage_kin = stage_kin, count = count)
-  hals_output_nys <- kin_svk1990_caswell2020$nys
-  hals_output_nys <- as.data.frame(hals_output_nys)
-  colnames(hals_output_nys) <- seq(0,109,1)
-  hals_output_nys$age_kin <- rep(seq(0, (110-1), 1), each = 6)
-  hals_output_nys$stage_kin <- rep(seq(1, 6), 110)
-  hcmp_nys <- hals_output_nys %>% reshape2::melt(id = c("age_kin","stage_kin")) %>%
+  hals_output_os <- kin_svk1990_caswell2020$os
+  hals_output_os <- as.data.frame(hals_output_os)
+  colnames(hals_output_os) <- seq(0,109,1)
+  hals_output_os$age_kin <- rep(seq(0, (110-1), 1), each = 6)
+  hals_output_os$stage_kin <- rep(seq(1, 6), 110)
+  hcmp_os <- hals_output_os %>% reshape2::melt(id = c("age_kin","stage_kin")) %>%
     dplyr::mutate(age_focal = variable,
                   count = value) %>%
     dplyr::select(age_kin, stage_kin, age_focal, count) %>%
     dplyr::transmute(age_focal = age_focal, age_kin = age_kin, stage_kin = stage_kin, count = count)
   
-  expect_equal(jcmp_nys$count, hcmp_nys$count)
+  
+  
+  
+  expect_equal(jcmp_ys$count, hcmp_ys$count)
+  expect_equal(jcmp_os$count, hcmp_os$count)
+  
   
 })
