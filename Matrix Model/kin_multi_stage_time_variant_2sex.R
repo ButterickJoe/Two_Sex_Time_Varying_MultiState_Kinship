@@ -61,6 +61,7 @@ kin_multi_stage_time_variant_2sex <- function(U_list_females = NULL,
   Focal_array <- list()
   mom_array <- list()
   gran_array <- list()
+  great_gran_array <- list()
   daughter_array <- list()
   younger_sis_array <- list()
   grand_daughter_array <-list()
@@ -170,6 +171,7 @@ kin_multi_stage_time_variant_2sex <- function(U_list_females = NULL,
       great_grand_daughter_array[[(1+length(great_grand_daughter_array))]] <- kin_out_1[["ggd"]]
       mom_array[[(1+length(mom_array))]] <- kin_out_1[["m"]]
       gran_array[[(1+length(gran_array))]] <- kin_out_1[["gm"]]
+      great_gran_array[[(1+length(great_gran_array))]] <- kin_out_1[["ggm"]]
       younger_sis_array[[( 1+length(younger_sis_array))]] <- kin_out_1[["ys"]]
       older_sister_array[[(1+length(older_sister_array))]] <- kin_out_1[["os"]]
       younger_aunt_array[[(1+length(younger_aunt_array))]] <- kin_out_1[["ya"]]
@@ -187,6 +189,7 @@ kin_multi_stage_time_variant_2sex <- function(U_list_females = NULL,
     updating_great_grand_daughter <- great_grand_daughter_array[[year]]
     updating_mom <- mom_array[[year]]
     updating_gran <- gran_array[[year]]
+    updating_great_gran <- great_gran_array[[year]]
     updating_younger_sis <- younger_sis_array[[year]]
     updating_older_sis <- older_sister_array[[year]]
     updating_youner_aunt <- younger_aunt_array[[year]]
@@ -214,6 +217,7 @@ kin_multi_stage_time_variant_2sex <- function(U_list_females = NULL,
                              updating_great_grand_daughter,
                              updating_mom,
                              updating_gran,
+                             updating_great_gran,
                              updating_older_sis,
                              updating_younger_sis,
                              updating_older_niece,
@@ -230,6 +234,7 @@ kin_multi_stage_time_variant_2sex <- function(U_list_females = NULL,
     great_grand_daughter_array[[(1+length(great_grand_daughter_array))]] <- kin_out[["ggd"]]
     mom_array[[(1+length(mom_array))]] <- kin_out[["m"]]
     gran_array[[(1+length(gran_array))]] <- kin_out[["gm"]]
+    great_gran_array[[(1+length(great_gran_array))]] <- kin_out[["ggm"]]
     younger_sis_array[[(1+length(younger_sis_array))]] <- kin_out[["ys"]]
     older_sister_array[[(1+length(older_sister_array))]] <- kin_out[["os"]]
     younger_aunt_array[[(1+length(younger_aunt_array))]] <- kin_out[["ya"]]
@@ -249,6 +254,7 @@ kin_multi_stage_time_variant_2sex <- function(U_list_females = NULL,
                         "ggd" = great_grand_daughter_array,
                         "m" = mom_array,
                         "gm" = gran_array,
+                        "ggm" = great_gran_array,
                         "ys" = younger_sis_array,
                         "os" = older_sister_array,
                         "ya" = younger_aunt_array,

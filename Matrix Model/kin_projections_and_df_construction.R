@@ -34,8 +34,7 @@ all_kin_dy <- function(Uf,
   
   ## Projection matrices:
   
-  ## Uproj is a block diagonal matrix of block-structured Age*Stage matrices over sex...
-  ## ...independently over sex transfers individuals across stage and up age
+  ## Uproj is a block diagonal matrix of block-structured Age*Stage matrices; independently over sex transfers individuals across stage and up age
   Uproj <- Matrix::Matrix(block_diag_function(list(Uf, Um)), sparse = TRUE)
   ## Fproj is a Sex-block-structured matrix of block-structured Age*Stage matrices where males and females BOTH reproduce (by stage)
   Fproj <- Matrix::Matrix(nrow = (2*n), ncol = (2*n), data = 0, sparse = TRUE)
@@ -98,6 +97,7 @@ all_kin_dy <- function(Uf,
   X_great_grand_children <- Matrix::Matrix(nrow = (2*n), ncol = na, data = 0, sparse = TRUE)
   X_parents <- Matrix::Matrix(nrow = (2*n), ncol = na, data = 0, sparse = TRUE)
   X_grand_parents <- Matrix::Matrix(nrow = (2*n), ncol = na, data = 0, sparse = TRUE)
+  X_great_grand_parents <- Matrix::Matrix(nrow = (2*n), ncol = na, data = 0, sparse = TRUE)
   X_older_sibs  <- Matrix::Matrix(nrow = (2*n), ncol = na, data = 0, sparse = TRUE)
   X_younger_sibs  <- Matrix::Matrix(nrow = (2*n), ncol = na, data = 0, sparse = TRUE)
   X_older_niece_nephew  <- Matrix::Matrix(nrow = (2*n), ncol = na, data = 0, sparse = TRUE)
@@ -128,12 +128,15 @@ all_kin_dy <- function(Uf,
   # grand parents, older sibs, younger aunts/uncles, older nieces/nephews
   IC_f_grand_pars <- mothers_age_dist
   IC_m_grand_pars <- fathers_age_dist
+  IC_f_great_grand_pars <- mothers_age_dist
+  IC_m_great_grand_pars <- fathers_age_dist
   IC_older_sibs_f <- mothers_age_dist
   IC_younger_aunts_uncles_f <- mothers_age_dist
   IC_younger_aunts_uncles_m <- fathers_age_dist
   IC_older_niece_nephew_f <- mothers_age_dist
   for(ic in 1 : (na)){
     X_grand_parents[, 1] <- X_grand_parents[, 1] + (IC_f_grand_pars[ic] + IC_m_grand_pars[ic])*X_parents[,ic] ## IC the sum of parents of Focal's parents,
+    X_great_grand_parents[, 1] <- X_great_grand_parents[, 1] + (IC_f_great_grand_pars[ic] + IC_m_great_grand_pars[ic])*X_grand_parents[,ic]
     X_older_sibs[,1] <- X_older_sibs[,1] + IC_older_sibs_f[ic]*X_children[,ic]
     X_older_niece_nephew[,1] <- X_older_niece_nephew[,1] + IC_older_niece_nephew_f[ic]*X_grand_children[,ic]
     X_younger_aunts_uncles[,1] <- X_younger_aunts_uncles[,1] + (IC_younger_aunts_uncles_f[ic] + IC_younger_aunts_uncles_m[ic])*X_younger_sibs[,ic]
@@ -142,6 +145,7 @@ all_kin_dy <- function(Uf,
   ### Projections of grand parenst, older sibs, younger aunts/uncles, older nieces/nephews
   for(i in 1: (na-1)){
     X_grand_parents[, i+1] <- Uproj %*% X_grand_parents[, i]
+    X_great_grand_parents[, i+1] <- Uproj %*% X_great_grand_parents[, i]
     X_older_sibs[,i+1] <- Uproj %*% X_older_sibs[,i]
     X_older_niece_nephew[,i+1] <- Uproj %*% X_older_niece_nephew[,i] + Fproj %*% X_older_sibs[,i]
     X_younger_aunts_uncles[,i+1] <- Uproj %*% X_younger_aunts_uncles[,i] + Fprojstar %*% X_grand_parents[,i]
@@ -175,6 +179,7 @@ all_kin_dy <- function(Uf,
               "ggd" = X_great_grand_children,
               "m" = X_parents,
               "gm" = X_grand_parents,
+              "ggm" = X_great_grand_parents,
               "os" = X_older_sibs,
               "ys" = X_younger_sibs,
               "nos" = X_older_niece_nephew,
@@ -237,6 +242,7 @@ all_kin_dy_TV <- function(Uf,
                           prev_kin_greatgrandchildren,
                           prev_kin_parents,
                           prev_kin_grand_parents,
+                          prev_kin_great_grand_parents,
                           prev_kin_older_sibs,
                           prev_kin_younger_sibs,
                           prev_kin_older_niece_nephew,
@@ -305,6 +311,7 @@ all_kin_dy_TV <- function(Uf,
   X_great_grand_children <- Matrix::Matrix(nrow = (2*n), ncol = na, data = 0, sparse = TRUE)
   X_parents <- Matrix::Matrix(nrow = (2*n), ncol = na, data = 0, sparse = TRUE)
   X_grand_parents <- Matrix::Matrix(nrow = (2*n), ncol = na, data = 0, sparse = TRUE)
+  X_great_grand_parents <- Matrix::Matrix(nrow = (2*n), ncol = na, data = 0, sparse = TRUE)
   X_older_sibs <- Matrix::Matrix(nrow = (2*n), ncol = na, data = 0, sparse = TRUE)
   X_younger_sibs <- Matrix::Matrix(nrow = (2*n), ncol = na, data = 0, sparse = TRUE)
   X_older_niece_nephew <- Matrix::Matrix(nrow = (2*n), ncol = na, data = 0, sparse = TRUE)
@@ -333,12 +340,15 @@ all_kin_dy_TV <- function(Uf,
   # grand parents, older sibs, younger aunts/uncles, older nieces/nephews
   IC_f_grand_pars <- mothers_age_dist
   IC_m_grand_pars <- fathers_age_dist
+  IC_f_great_grand_pars <- mothers_age_dist
+  IC_m_great_grand_pars <- fathers_age_dist
   IC_younger_aunts_uncles_f <- mothers_age_dist
   IC_younger_aunts_uncles_m <- fathers_age_dist
   IC_older_sibs_f <- mothers_age_dist
   IC_older_niece_nephew_f <- mothers_age_dist
   for(ic in 1 : (na)){
     X_grand_parents[, 1] <- X_grand_parents[, 1] + (IC_f_grand_pars[ic] + IC_m_grand_pars[ic])*prev_kin_parents[,ic] ## IC the sum of parents of Focal's parents,
+    X_great_grand_parents[, 1] <- X_great_grand_parents[, 1] + (IC_f_great_grand_pars[ic] + IC_m_great_grand_pars[ic])*prev_kin_grand_parents[,ic] 
     X_older_sibs[,1] <- X_older_sibs[,1] + IC_older_sibs_f[ic]*prev_kin_children[,ic]
     X_older_niece_nephew[,1] <- X_older_niece_nephew[,1] + IC_older_niece_nephew_f[ic]*prev_kin_grandchildren[,ic]
     X_younger_aunts_uncles[,1] <- X_younger_aunts_uncles[,1] + (IC_younger_aunts_uncles_f[ic] + IC_younger_aunts_uncles_m[ic])*prev_kin_younger_sibs[,ic]
@@ -347,6 +357,7 @@ all_kin_dy_TV <- function(Uf,
   ### Projections of older sibs, younger aunts/uncles, older nieces/nephews
   for(i in 1: (na-1)){
     X_grand_parents[, i+1] <- Uproj %*% prev_kin_grand_parents[, i]
+    X_great_grand_parents[, i+1] <- Uproj %*% prev_kin_great_grand_parents[, i]
     X_older_sibs[,i+1] <- Uproj %*% prev_kin_older_sibs[,i]
     X_older_niece_nephew[,i+1] <- Uproj %*% prev_kin_older_niece_nephew[,i] + Fproj %*% prev_kin_older_sibs[,i]
     X_younger_aunts_uncles[,i+1] <- Uproj %*% prev_kin_younger_aunts_uncles[,i] + Fprojstar %*% prev_kin_grand_parents[,i]
@@ -379,6 +390,7 @@ all_kin_dy_TV <- function(Uf,
               "ggd" = X_great_grand_children,
               "m" = X_parents,
               "gm" = X_grand_parents,
+              "ggm" = X_great_grand_parents,
               "os" = X_older_sibs,
               "ys" = X_younger_sibs,
               "nos" = X_older_niece_nephew,
