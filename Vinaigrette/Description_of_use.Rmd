@@ -15,7 +15,7 @@ Note that this is currently an R project and not package. To run code in this vi
 library(Matrix)
 library(tictoc)
 `%>%` <- magrittr::`%>%`
-source(here::here("Matrix Model" , "Two_Sex_Time_Variant_MultiState_Kin.R"))
+source(here::here("Matrix Model" , "kin_multi_stage_time_variant_2sex.R"))
 
 options(dplyr.summarise.inform = FALSE) # hide if we don't want to see summarise output (but also #lose #progress bar)
 
@@ -100,21 +100,21 @@ no_years <- 40
 # and we start projecting kin in 1965
 # We decide here to count accumulated kin by age of Focal, and not distributions of kin
 kin_out_1965_2005 <- 
-  kin_multi_stage_TV_2_sex(U_mat_fem[1:(1+no_years)],
-                           U_mat_male[1:(1+no_years)],
-                           F_mat_fem[1:(1+no_years)],
-                           F_mat_male[1:(1+no_years)],
-                           T_mat_fem[1:(1+no_years)],
-                           T_mat_fem[1:(1+no_years)],
-                           H_mat[1:(1+no_years)],
-                           alpha = 0.51, ## Sex ratio -- UK value 
-                           specific_kin = FALSE,
-                           parity = TRUE,
-                           dist_output = FALSE,
-                           sex_Focal = "Female", ##  define Focal's sex at birth 
-                           stage_Focal = 1, ## Define Focal's stage at birth 
-                           n_inc = 1, # width of age class
-                           seq(1965, (1965 + no_years)) ## the sequence of years we run the function over
+  kin_multi_stage_time_variant_2sex(U_mat_fem[1:(1+no_years)],
+                                    U_mat_male[1:(1+no_years)],
+                                    F_mat_fem[1:(1+no_years)],
+                                    F_mat_male[1:(1+no_years)],
+                                    T_mat_fem[1:(1+no_years)],
+                                    T_mat_fem[1:(1+no_years)],
+                                    H_mat[1:(1+no_years)],
+                                    birth_female = 1 - 0.51, ## Sex ratio -- UK value
+                                    parity = TRUE,
+                                    output_kin = FALSE,
+                                    summary_kin = TRUE,
+                                    sex_Focal = "Female", ##  define Focal's sex at birth 
+                                    initial_stage_Focal = 1, ## Define Focal's stage at birth 
+                                    n_inc = 1, # width of age class
+                                    output_years = seq(1965, (1965 + no_years)) ## the sequence of years we run the function over
   )
 ```
 ### 1.1. Visualizing kin ###
@@ -127,9 +127,9 @@ For an example, let's say we really want to understand the age*parity distributi
 kin_out_1965_2005 %>% 
   dplyr::filter(group == "oa", 
                 year %in% c(1965, 1975, 1985, 1995, 2005)) %>%
-  ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
+  ggplot2::ggplot(ggplot2::aes(x = age_focal, y = count, color = stage_kin, fill = stage_kin)) +
   ggplot2::geom_bar(position = "stack", stat = "identity") + 
-  ggplot2::facet_grid(Sex~year) +
+  ggplot2::facet_grid(sex_kin ~ year) +
   ggplot2::scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + 
   ggplot2::theme_bw() +
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 
@@ -141,9 +141,9 @@ We could also consider any other kin in Focal's network, for instance, offspring
 kin_out_1965_2005 %>% 
   dplyr::filter(group == "d", 
                 year %in% c(1965, 1975, 1985, 1995, 2005)) %>%
-  ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
+  ggplot2::ggplot(ggplot2::aes(x = age_focal, y = count, color = stage_kin, fill = stage_kin)) +
   ggplot2::geom_bar(position = "stack", stat = "identity") + 
-  ggplot2::facet_grid(Sex~year) +
+  ggplot2::facet_grid(sex_kin ~ year) +
   ggplot2::scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + 
   ggplot2::theme_bw() +
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 
@@ -157,9 +157,9 @@ Below, following from the above example, we once again consider offspring
 ```{r, fig.height = 6, fig.width = 8}
 kin_out_1965_2005 %>% 
   dplyr::filter(group == "d", cohort %in% c(1910,1925,1965) ) %>%
-  ggplot2::ggplot(ggplot2::aes(x = Age_Focal, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
+  ggplot2::ggplot(ggplot2::aes(x = age_focal, y = count, color = stage_kin, fill = stage_kin)) +
   ggplot2::geom_bar(position = "stack", stat = "identity") + 
-  ggplot2::facet_grid(Sex~cohort)  + 
+  ggplot2::facet_grid(sex_kin ~ cohort)  + 
   ggplot2::theme_bw() +
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 
   ggplot2::ylab("Offspring") 
@@ -177,23 +177,25 @@ To obtain distributions of kin as output, we simply change the function argument
 ```{r, message=FALSE, warning=FALSE}
 rm(kin_out_1965_2005)
 gc()
+no_years <- 40
 
 kin_out_1965_2005_full <- 
-  kin_multi_stage_TV_2_sex(U_mat_fem[1:(1+no_years)],
-                           U_mat_male[1:(1+no_years)],
-                           F_mat_fem[1:(1+no_years)],
-                           F_mat_male[1:(1+no_years)],
-                           T_mat_fem[1:(1+no_years)],
-                           T_mat_fem[1:(1+no_years)],
-                           H_mat[1:(1+no_years)],
-                           alpha = 0.51, ## Sex ratio -- UK value 
-                           specific_kin = FALSE,
-                           parity = TRUE,
-                           dist_output = TRUE,
-                           sex_Focal = "Female", ##  define Focal's sex at birth 
-                           stage_Focal = 1, ## Define Focal's stage at birth 
-                           n_inc = 1, ## age-increment 
-                           seq(1965, (1965 + no_years)))
+  kin_multi_stage_time_variant_2sex(U_mat_fem[1:(1+no_years)],
+                                    U_mat_male[1:(1+no_years)],
+                                    F_mat_fem[1:(1+no_years)],
+                                    F_mat_male[1:(1+no_years)],
+                                    T_mat_fem[1:(1+no_years)],
+                                    T_mat_fem[1:(1+no_years)],
+                                    H_mat[1:(1+no_years)],
+                                    birth_female = 1 - 0.51, ## Sex ratio -- UK value
+                                    parity = TRUE,
+                                    output_kin = FALSE,
+                                    summary_kin = FALSE,
+                                    sex_Focal = "Female", ##  define Focal's sex at birth 
+                                    initial_stage_Focal = 1, ## Define Focal's stage at birth 
+                                    n_inc = 1, # width of age class
+                                    output_years = seq(1965, (1965 + no_years)) ## the sequence of years we run the function over
+  )
 ```
 ### 2.1. Visualizing kin ###
 
@@ -206,10 +208,10 @@ Below I plot the expected age*stage distribution of an average Focal's younger s
 kin_out_1965_2005_full %>% 
   dplyr::filter(group == "ys", 
                 year %in% c(1965, 1975, 1985, 1995, 2005),
-                Age_Focal == 50) %>%
-  ggplot2::ggplot(ggplot2::aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
+                age_focal == 50) %>%
+  ggplot2::ggplot(ggplot2::aes(x = age_kin, y = count, color = stage_kin, fill = stage_kin)) +
   ggplot2::geom_bar(position = "stack", stat = "identity") + 
-  ggplot2::facet_grid(Sex~year) +
+  ggplot2::facet_grid(sex_kin ~ year) +
   ggplot2::scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + 
   ggplot2::theme_bw() +
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 
@@ -222,10 +224,10 @@ As expected, the discontinuity reflects the fact that Focal's younger siblings c
 kin_out_1965_2005_full %>% 
   dplyr::filter(group == "os", 
                 year %in% c(1965, 1975, 1985, 1995, 2005),
-                Age_Focal == 50) %>%
-  ggplot2::ggplot(ggplot2::aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
+                age_focal == 50) %>%
+  ggplot2::ggplot(ggplot2::aes(x = age_kin, y = count, color = stage_kin, fill = stage_kin)) +
   ggplot2::geom_bar(position = "stack", stat = "identity") + 
-  ggplot2::facet_grid(Sex~year) +
+  ggplot2::facet_grid(sex_kin ~ year) +
   ggplot2::scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + 
   ggplot2::theme_bw() +
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 
@@ -238,12 +240,12 @@ With a simple bit of playing with the output data frame, we can plot the age*sta
 kin_out_1965_2005_full %>% 
   dplyr::filter((group == "ys" | group == "os"), 
                 year %in% c(1965, 1975, 1985, 1995, 2005),
-                Age_Focal == 50) %>%
-  tidyr::pivot_wider(names_from = group, values_from = pred_no_kin) %>%
-  dplyr::mutate(pred_no_kin = `ys` + `os`) %>%
-  ggplot2::ggplot(ggplot2::aes(x = Age_Kin, y = pred_no_kin, color = Stage_Kin, fill = Stage_Kin)) +
+                age_focal == 50) %>%
+  tidyr::pivot_wider(names_from = group, values_from = count) %>%
+  dplyr::mutate(count = `ys` + `os`) %>%
+  ggplot2::ggplot(ggplot2::aes(x = age_kin, y = count, color = stage_kin, fill = stage_kin)) +
   ggplot2::geom_bar(position = "stack", stat = "identity") + 
-  ggplot2::facet_grid(Sex~year) +
+  ggplot2::facet_grid(sex_kin ~ year) +
   ggplot2::scale_x_continuous(breaks = c(0,10,20,30,40,50,60,70,80,90,100)) + 
   ggplot2::theme_bw() +
   ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)) + 

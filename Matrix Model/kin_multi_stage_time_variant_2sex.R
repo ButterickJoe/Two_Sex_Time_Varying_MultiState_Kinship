@@ -2,7 +2,7 @@
 
 
 source(here::here("Matrix Model", "matrix_operations.R" ))
-source(here::here("Matrix Model", "kin_projections1.R" ))
+source(here::here("Matrix Model", "kin_projections_and_df_construction.R" ))
 
 #' Estimate kin counts by age, stage, and sex, in a time variant framework
 
