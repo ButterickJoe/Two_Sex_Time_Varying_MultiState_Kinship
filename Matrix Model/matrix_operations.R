@@ -8,7 +8,7 @@ block_diag_function <- function(mat_list){
   r = dims[1]
   diagmat <- Matrix::Matrix(nrow = (r*s), ncol = (r*s), data = 0, sparse = TRUE)
   for(i in 1:s){
-      diagmat = diagmat + kronecker(E_matrix(i,i,s,s), mat_list[[i]])
+    diagmat = diagmat + kronecker(E_matrix(i,i,s,s), mat_list[[i]])
   }
   return(diagmat)
 }
@@ -22,9 +22,9 @@ pi_mix <- function(Uf, Um, Ff, Fm, alpha, na, ns){
   A <- block_diag_function(list(Uf,Um)) + F_block
   stable_dist_vec <- SD(A)
   ### Joint distributions
-  pi_f <-  Matrix::t( rep(1, na*ns) %*% Ff )*stable_dist_vec[1:n] 
+  pi_f <-  Matrix::t( rep(1, na*ns) %*% Ff )*stable_dist_vec[1:n]
   pi_f <- pi_f / abs(sum(pi_f))
-  pi_m <-  Matrix::t( rep(1, na*ns) %*% Fm )*stable_dist_vec[(1+n):(2*n)] 
+  pi_m <-  Matrix::t( rep(1, na*ns) %*% Fm )*stable_dist_vec[(1+n):(2*n)]
   pi_m <- pi_m / abs(sum(pi_m))
   ### Age distributions
   pi_F <- kronecker( diag(na), Matrix::t(rep(1, ns)) ) %*% (pi_f)
@@ -35,9 +35,9 @@ pi_mix <- function(Uf, Um, Ff, Fm, alpha, na, ns){
 pi_mix_TV <- function(Ff, Fm, alpha, na, ns, previous_age_stage_dist){
   n <- length(Ff[1,])
   ### Joint distributions
-  pi_f <-  Matrix::t( rep(1,na*ns) %*% Ff )*previous_age_stage_dist[1:n] 
+  pi_f <-  Matrix::t( rep(1,na*ns) %*% Ff )*previous_age_stage_dist[1:n]
   pi_f <- pi_f / abs(sum(pi_f))
-  pi_m <-  Matrix::t( rep(1,na*ns) %*% Fm )*previous_age_stage_dist[(1+n):(2*n)] 
+  pi_m <-  Matrix::t( rep(1,na*ns) %*% Fm )*previous_age_stage_dist[(1+n):(2*n)]
   pi_m <- pi_m / abs(sum(pi_m))
   ### Age distributions
   pi_F <- kronecker( diag(na), Matrix::t(rep(1, ns)) ) %*% (pi_f)
@@ -131,7 +131,7 @@ marg_stage_dist <- function(na, ns, full_dist){
 marg_age_dist <- function(na, ns, full_dist){
   return(kronecker( Matrix::diag(na) , Matrix::t(rep(1, ns)) ) %*% full_dist)
 }
-## Matirx operations -- defining the vec permutation martix 
+## Matirx operations -- defining the vec permutation martix
 e_vector <- function(i, n){
   e <- rep(0, n)
   e[i] <- 1
