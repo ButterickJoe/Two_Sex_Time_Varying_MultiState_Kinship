@@ -58,12 +58,12 @@ To avoid further calculations these lists are constructed in another file and si
 
 # Lets construct these lists as model inputs..............
 
-F_mat_fem <- readr::read_rds(here::here("Data","FF_list.Rds"))
-F_mat_male <- readr::read_rds(here::here("Data","FM_list.Rds"))
-T_mat_fem <- readr::read_rds(here::here("Data","T_list.Rds"))
-U_mat_fem <- readr::read_rds(here::here("Data","UF_list.Rds"))
-U_mat_male <- readr::read_rds(here::here("Data","UM_list.Rds"))
-H_mat <- readr::read_rds(here::here("Data","H_list.Rds"))
+F_mat_fem <- readr::read_rds(here::here("data","FF_list.Rds"))
+F_mat_male <- readr::read_rds(here::here("data","FM_list.Rds"))
+T_mat_fem <- readr::read_rds(here::here("data","T_list.Rds"))
+U_mat_fem <- readr::read_rds(here::here("data","UF_list.Rds"))
+U_mat_male <- readr::read_rds(here::here("data","UM_list.Rds"))
+H_mat <- readr::read_rds(here::here("data","H_list.Rds"))
 
 ```
 
