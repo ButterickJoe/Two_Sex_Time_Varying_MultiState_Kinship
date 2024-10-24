@@ -52,7 +52,7 @@ test_that("same output in multi_stage (caswell 2020)", {
     dplyr::select(age_kin, stage_kin, age_focal, count) %>%
     dplyr::transmute(age_focal = age_focal, age_kin = age_kin, stage_kin = stage_kin, count = count)
   
-  ## Nieces through sisters
+  ## Older sisters
   jcmp_os <- joe_output %>% dplyr::filter(sex_kin == "Female", group == "os") %>%
     dplyr::select(age_focal, age_kin, stage_kin, count) %>%
     dplyr::transmute(age_focal = age_focal, age_kin = age_kin, stage_kin = stage_kin, count = count)
