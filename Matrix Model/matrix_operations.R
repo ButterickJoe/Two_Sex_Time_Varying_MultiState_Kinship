@@ -1,6 +1,6 @@
-## This file contains a load of functions which are required to perform matrix operations within the main code
+## This file contains a load of functions which are required to run the file "kin_projections_and_df_construction.R"
 
-## Define a function which composes a direct sum from a list of matrices (ie. a block diagonal matrix)
+## Construct a matrix composed as a direct sum of a list of matrices 
 block_diag_function <- function(mat_list){
   s = length(mat_list)
   u1 = mat_list[[1]]
@@ -12,8 +12,31 @@ block_diag_function <- function(mat_list){
   }
   return(diagmat)
 }
-## Mixing distributions in the 2-sex model (note this is a joint age-stage dist. We must extract the age-dist below)
-## Non-parity case
+
+## Construct a matrix which transfers Focal across stages, while ensuring Focal survives with probability 1
+get_G <- function(U, na, ns){
+  sig <- Matrix::t(rep(1,na*ns)) %*% U
+  diag <- Matrix::diag(sig[1,])
+  G <- U %*% MASS::ginv(diag)
+  return(G)
+}
+
+#' Mixing distributions for the time-invariant multi-state 2-sex model: Non-parity case
+#'
+#' @param Uf matrix. Block-structured matrix which transfers females over stage and advances their age
+#' @param Um matrix. Block-structured matrix which transfers males over stage and advances their age
+#' @param Ff matrix. Block-structured matrix which counts reproduction by females and assigns newborns an age and stage
+#' @param Fm matrix. Block-structured matrix which counts reproduction by males and assigns newborns an age and stage
+#' @param alpha scalar. Birth ratio male:female
+#' @param na scalar. Number of age-classes
+#' @param ns scalar. Number of stages
+#'
+#' @return list (of vectors). list[[1]] = full age*stage*sex distribution
+#'                            list[[2]] = female age*stage distribution normalised
+#'                            list[[3]] = male age*stage distribution normalised
+#'                            list[[4]] = female marginal age distribution normalised
+#'                            list[[5]] = male marginal age distribution normalised
+#' @export
 pi_mix <- function(Uf, Um, Ff, Fm, alpha, na, ns){
   n <- length(Uf[1,])
   F_block <- Matrix::Matrix(nrow = (2*n), ncol = (2*n), data = 0, sparse = TRUE)
@@ -31,7 +54,22 @@ pi_mix <- function(Uf, Um, Ff, Fm, alpha, na, ns){
   pi_M <- kronecker( diag(na), Matrix::t(rep(1, ns)) ) %*% (pi_m)
   return(list(c(pi_f,pi_m),pi_f,pi_m,pi_F,pi_M))
 }
-## Time-varying analogue
+
+#' Mixing distributions for the time-variant multi-state 2-sex model: Non-parity case
+#'
+#' @param Ff matrix. Block-structured matrix which counts reproduction by females and assigns newborns an age and stage
+#' @param Fm matrix. Block-structured matrix which counts reproduction by males and assigns newborns an age and stage
+#' @param alpha scalar. Birth ratio male:female
+#' @param na scalar. Number of age-classes
+#' @param ns scalar. Number of stages
+#' @param previous_age_stage_dist vector. Last years population structure (age*stage*sex full distribution)
+#'
+#' @return list (of vectors). list[[1]] = full age*stage*sex distribution
+#'                            list[[2]] = female age*stage distribution normalised
+#'                            list[[3]] = male age*stage distribution normalised
+#'                            list[[4]] = female marginal age distribution normalised
+#'                            list[[5]] = male marginal age distribution normalised
+#' @export
 pi_mix_TV <- function(Ff, Fm, alpha, na, ns, previous_age_stage_dist){
   n <- length(Ff[1,])
   ### Joint distributions
@@ -44,7 +82,23 @@ pi_mix_TV <- function(Ff, Fm, alpha, na, ns, previous_age_stage_dist){
   pi_M <- kronecker( diag(na), Matrix::t(rep(1, ns)) ) %*% (pi_m)
   return(list(c(pi_f,pi_m),pi_f,pi_m,pi_F,pi_M))
 }
-## Parity case
+
+#' Mixing distributions for the time-invariant multi-state 2-sex model: Parity-specific case
+#'
+#' @param Uf matrix. Block-structured matrix which transfers females over stage and advances their age
+#' @param Um matrix. Block-structured matrix which transfers males over stage and advances their age
+#' @param Ff matrix. Block-structured matrix which counts reproduction by females and assigns newborns an age and stage
+#' @param Fm matrix. Block-structured matrix which counts reproduction by males and assigns newborns an age and stage
+#' @param alpha scalar. Birth ratio male:female
+#' @param na scalar. Number of age-classes
+#' @param ns scalar. Number of stages
+#'
+#' @return list (of vectors). list[[1]] = full age*stage*sex distribution
+#'                            list[[2]] = female age*stage distribution normalised
+#'                            list[[3]] = male age*stage distribution normalised
+#'                            list[[4]] = female marginal age distribution normalised
+#'                            list[[5]] = male marginal age distribution normalised
+#' @export
 pi_mix_parity <- function(Uf, Um, Ff, Fm, alpha, na, ns){
   n <- length(Uf[1,])
   F_block <- Matrix::Matrix(nrow = (2*n), ncol = (2*n), data = 0, sparse = TRUE)
@@ -71,7 +125,24 @@ pi_mix_parity <- function(Uf, Um, Ff, Fm, alpha, na, ns){
   pi_m <- out_dad %*% pi_M
   return(list(c(pi_f,pi_m), pi_f, pi_m, pi_F, pi_M))
 }
-## Time-variant analogue
+
+#' Mixing distributions for the time-variant multi-state 2-sex model: Parity-specific case
+#'
+#' @param Uf matrix. Block-structured matrix which transfers females over stage and advances their age
+#' @param Um matrix. Block-structured matrix which transfers males over stage and advances their age
+#' @param Ff matrix. Block-structured matrix which counts reproduction by females and assigns newborns an age and stage
+#' @param Fm matrix. Block-structured matrix which counts reproduction by males and assigns newborns an age and stage
+#' @param alpha scalar. Birth ratio male:female
+#' @param na scalar. Number of age-classes
+#' @param ns scalar. Number of stages
+#' @param previous_age_stage_dist vector. Last years population structure (age*stage*sex full distribution)
+#'
+#' @return list (of vectors). list[[1]] = full age*stage*sex distribution
+#'                            list[[2]] = female age*stage distribution normalised
+#'                            list[[3]] = male age*stage distribution normalised
+#'                            list[[4]] = female marginal age distribution normalised
+#'                            list[[5]] = male marginal age distribution normalised
+#' @export
 pi_mix_TV_parity <- function(Ff, Fm, alpha, na, ns, previous_age_stage_dist){
   n <- length(Ff[1,])
   pi_f <-  Matrix::t( rep(1,na*ns) %*% Ff )*previous_age_stage_dist[1:n]
@@ -93,21 +164,20 @@ pi_mix_TV_parity <- function(Ff, Fm, alpha, na, ns, previous_age_stage_dist){
   pi_m <- out_dad %*% pi_M
   return(list(c(pi_f,pi_m),pi_f,pi_m,pi_F,pi_M))
 }
-######################################################### Some useful utility functions
-## A matrix which projects Focal over age and stages
-get_G <- function(U, na, ns){
-  sig <- Matrix::t(rep(1,na*ns)) %*% U
-  diag <- Matrix::diag(sig[1,])
-  G <- U %*% MASS::ginv(diag)
-  return(G)
-}
-# The growth rate -- the spectral radius of PM
+
+
+######################################################### Some useful utility functions required
+
+
+###################################################### Eigen-decomposition of a matrix
+
+# Calculate the spectral radius of a matrix (growth rate in Demographics)
 lambda <- function(PM) {
   lead_eig <- (abs(eigen(PM, only.values = TRUE)$values))
   lead_eig <- lead_eig[which.max(lead_eig)]
   return(lead_eig)
 }
-# stable age/stage distribution
+# Find the column-eigenvector corresponding to the spectral radius (Stable population structure in Demographics)
 SD <- function(PM) {
   spectral_stuff <- eigen(PM)
   spectral_stuff <- Re(spectral_stuff$vectors[, which.max(abs(spectral_stuff$values))])
@@ -115,7 +185,7 @@ SD <- function(PM) {
   vec_lambda <- spectral_stuff/sum(spectral_stuff)
   return(vec_lambda)
 }
-# reproductive values as the (left) eigenvector -- lambda
+# Find the row-eigenvector corresponding to the spectral radius (Stable reproductive values in Demographics)
 RD <- function(PM) {
   spectral_stuff <- eigen(t(PM))
   spectral_stuff <- Re(spectral_stuff$vectors[, which.max(abs(spectral_stuff$values))])
@@ -123,27 +193,23 @@ RD <- function(PM) {
   vec_lambda <- spectral_stuff/sum(spectral_stuff)
   return(vec_lambda)
 }
-## The marginal stage distribution (i.e., summing over all ages)
-marg_stage_dist <- function(na, ns, full_dist){
-  return(kronecker( Matrix::t(rep(1, na)) , Matrix::diag(ns) ) %*% full_dist)
-}
-# The marginal age dist (i.e., summing over all stages)
-marg_age_dist <- function(na, ns, full_dist){
-  return(kronecker( Matrix::diag(na) , Matrix::t(rep(1, ns)) ) %*% full_dist)
-}
-## Matirx operations -- defining the vec permutation martix
+
+###################################################### Useful matrix operations
+
+## Constructing a unit vector with a 1 in the ith position
 e_vector <- function(i, n){
   e <- rep(0, n)
   e[i] <- 1
   return(e)
 }
+## Creating a matrix of zeros with a 1 in the i,j-th entry
 E_matrix <- function(i,j,n,m){
-  #E <- matrix(0, nrow = n, ncol = m, byrow = TRUE)
   E <- Matrix::Matrix(nrow = (n), ncol = (m), data = 0, sparse = TRUE)
   E[i,j] <- 1
   return(E)
   
 }
+## Creating the Vec-commutation matrix
 K_perm_mat <- function(n,m){
   perm <- Matrix::Matrix(nrow = (n*m), ncol = (n*m), data = 0, sparse = TRUE)
   for(i in 1:n){
